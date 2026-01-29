@@ -274,30 +274,37 @@ def create_assessment(request, sphere_id):
     })
 
 
+@login_required
 def assessment_history(request):
-    assessments = SphereAssessment.objects.filter(user=request.user).order_by('-date')
+    # Получаем все оценки
+    assessments = SphereAssessment.objects.filter(
+        user=request.user
+    ).select_related('sphere').order_by('-date')
 
-    # Подсчет статистики
+    # Статистика
     total_count = assessments.count()
-
-    # Подсчет оценок за последние 7 дней
     week_ago = timezone.now().date() - timedelta(days=7)
     last_week_count = assessments.filter(date__gte=week_ago).count()
 
-    # Подсчет средней оценки
-    if total_count > 0:
-        total_sum = sum(assessment.value for assessment in assessments)
-        average_score = round(total_sum / total_count, 1)
-    else:
-        average_score = 0
+    # Средняя оценка
+    avg_result = assessments.aggregate(avg=Avg('value'))
+    average_score = round(avg_result['avg'], 1) if avg_result['avg'] else 0
+
+    # Пагинация (8 оценок на страницу)
+    paginator = Paginator(assessments, 8)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except (PageNotAnInteger, EmptyPage):
+        page_obj = paginator.get_page(1)
 
     return render(request, 'spheres/assessment_history.html', {
-        'assessments': assessments,
+        'assessments': page_obj.object_list,  # Только оценки текущей страницы
+        'page_obj': page_obj,                 # Для пагинации
         'total_count': total_count,
         'last_week_count': last_week_count,
-        'average_score': average_score,  # ← ЭТО УЖЕ ЕСТЬ!
+        'average_score': average_score,
     })
-
 
 @login_required
 def goal_list(request):

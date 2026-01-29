@@ -115,6 +115,45 @@
         text-transform: uppercase;
         letter-spacing: 1px;
     }
+    /* Стили пагинации */
+.pagination-container {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    gap: 0.3rem;
+}
+.page-item .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.6rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    color: var(--primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.page-item .page-link:hover {
+    background-color: rgba(74, 111, 165, 0.1);
+    color: var(--primary);
+}
+.page-item.active .page-link {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+.page-item.disabled .page-link {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+}
 </style>
 {% endblock %}
 
@@ -164,82 +203,155 @@
         </div>
 
         <!-- Список оценок -->
-        <div class="mt-4">
-            <h3 class="mb-4" style="color: var(--primary);">
-                <i class="bi bi-list-check me-2"></i>Все оценки
-            </h3>
+        <!-- Список оценок -->
+<div class="mt-4">
+    <h3 class="mb-4" style="color: var(--primary);">
+        <i class="bi bi-list-check me-2"></i>Все оценки
+        {% if page_obj.paginator.num_pages > 1 %}
+        <span class="badge bg-primary ms-2">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+        {% endif %}
+    </h3>
 
-            {% for assessment in assessments %}
-            <div class="assessment-card">
-                <div class="row align-items-center">
-                    <!-- Балл -->
-                    <div class="col-md-2">
-                        <div class="d-flex flex-column align-items-center">
-                            <div class="assessment-score">
-                                {{ assessment.value }}
-                            </div>
-                            <div class="score-indicator">
-                                <div class="score-fill" style="width: {% widthratio assessment.value 10 100 %}%;
-                                    background:
-                                    {% if assessment.value <= 3 %}
-                                        linear-gradient(90deg, #e74c3c, #e67e22)
-                                    {% elif assessment.value <= 5 %}
-                                        linear-gradient(90deg, #e67e22, #f1c40f)
-                                    {% elif assessment.value <= 7 %}
-                                        linear-gradient(90deg, #2ecc71, #27ae60)
-                                    {% else %}
-                                        linear-gradient(90deg, #3498db, #2c3e50)
-                                    {% endif %};">
-                                </div>
-                            </div>
-                            <small class="text-muted mt-1">из 10</small>
+    {% for assessment in assessments %}
+    <div class="assessment-card">
+        <div class="row align-items-center">
+            <!-- Балл -->
+            <div class="col-md-2">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="assessment-score">
+                        {{ assessment.value }}
+                    </div>
+                    <div class="score-indicator">
+                        <div class="score-fill" style="width: {% widthratio assessment.value 10 100 %}%;
+                            background:
+                            {% if assessment.value <= 3 %}
+                                linear-gradient(90deg, #e74c3c, #e67e22)
+                            {% elif assessment.value <= 5 %}
+                                linear-gradient(90deg, #e67e22, #f1c40f)
+                            {% elif assessment.value <= 7 %}
+                                linear-gradient(90deg, #2ecc71, #27ae60)
+                            {% else %}
+                                linear-gradient(90deg, #3498db, #2c3e50)
+                            {% endif %};">
                         </div>
                     </div>
+                    <small class="text-muted mt-1">из 10</small>
+                </div>
+            </div>
 
-                    <!-- Информация -->
-                    <div class="col-md-10">
-                        <div class="d-flex align-items-center">
-                            <!-- Иконка сферы -->
-                            <div class="sphere-icon-small" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
-                                {% if assessment.sphere.title == "Здоровье" %}
-                                    <i class="bi bi-heart-pulse"></i>
-                                {% elif assessment.sphere.title == "Финансы" %}
-                                    <i class="bi bi-cash-stack"></i>
-                                {% elif assessment.sphere.title == "Карьера" %}
-                                    <i class="bi bi-briefcase"></i>
-                                {% elif assessment.sphere.title == "Отношения" %}
-                                    <i class="bi bi-people"></i>
-                                {% elif assessment.sphere.title == "Семья" %}
-                                    <i class="bi bi-house-heart"></i>
-                                {% elif assessment.sphere.title == "Личностный рост" %}
-                                    <i class="bi bi-lightbulb"></i>
-                                {% elif assessment.sphere.title == "Духовность" %}
-                                    <i class="bi bi-flower1"></i>
-                                {% elif assessment.sphere.title == "Отдых и развлечения" %}
-                                    <i class="bi bi-emoji-smile"></i>
-                                {% else %}
-                                    <i class="bi bi-circle"></i>
-                                {% endif %}
-                            </div>
+            <!-- Информация -->
+            <div class="col-md-10">
+                <div class="d-flex align-items-center">
+                    <!-- Иконка сферы -->
+                    <div class="sphere-icon-small" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
+                        {% if assessment.sphere.title == "Здоровье" %}
+                            <i class="bi bi-heart-pulse"></i>
+                        {% elif assessment.sphere.title == "Финансы" %}
+                            <i class="bi bi-cash-stack"></i>
+                        {% elif assessment.sphere.title == "Карьера" %}
+                            <i class="bi bi-briefcase"></i>
+                        {% elif assessment.sphere.title == "Отношения" %}
+                            <i class="bi bi-people"></i>
+                        {% elif assessment.sphere.title == "Семья" %}
+                            <i class="bi bi-house-heart"></i>
+                        {% elif assessment.sphere.title == "Личностный рост" %}
+                            <i class="bi bi-lightbulb"></i>
+                        {% elif assessment.sphere.title == "Духовность" %}
+                            <i class="bi bi-flower1"></i>
+                        {% elif assessment.sphere.title == "Отдых и развлечения" %}
+                            <i class="bi bi-emoji-smile"></i>
+                        {% else %}
+                            <i class="bi bi-circle"></i>
+                        {% endif %}
+                    </div>
 
-                            <!-- Детали -->
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1" style="color: var(--primary);">{{ assessment.sphere.title }}</h5>
-                                <div class="assessment-date">
-                                    <i class="bi bi-calendar me-1"></i>{{ assessment.date|date:"d E Y" }}
-                                </div>
-                                {% if assessment.comment %}
-                                <p class="mb-0 mt-2 small text-muted">
-                                    <i class="bi bi-chat-left-text me-1"></i>{{ assessment.comment }}
-                                </p>
-                                {% endif %}
-                            </div>
+                    <!-- Детали -->
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1" style="color: var(--primary);">{{ assessment.sphere.title }}</h5>
+                        <div class="assessment-date">
+                            <i class="bi bi-calendar me-1"></i>{{ assessment.date|date:"d E Y" }}
                         </div>
+                        {% if assessment.comment %}
+                        <p class="mb-0 mt-2 small text-muted">
+                            <i class="bi bi-chat-left-text me-1"></i>{{ assessment.comment }}
+                        </p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
+    </div>
+    {% endfor %}
+
+    <!-- Пагинация -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-container mt-4 pt-3 border-top">
+        <nav aria-label="Навигация по страницам">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="Первая">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Предыдущая">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                </li>
+                {% endif %}
+
+                <!-- Номера страниц -->
+                {% for num in page_obj.paginator.page_range %}
+                    {% if num == page_obj.number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Следующая">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Последняя">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+                </li>
+                {% endif %}
+            </ul>
+            <div class="text-center text-muted mt-2">
+                Показано {{ page_obj.start_index }}–{{ page_obj.end_index }} из {{ total_count }} оценок
+            </div>
+        </nav>
+    </div>
+    {% endif %}
+</div>
     {% else %}
         <!-- Состояние без оценок -->
         <div class="empty-history">
