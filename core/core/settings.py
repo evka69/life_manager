@@ -109,6 +109,7 @@ LOGIN_URL = '/login/'
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+# Русский язык
 LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'Europe/Moscow'
