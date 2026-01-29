@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+{% block title %}Вход — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, rgba(74, 111, 165, 0.03) 0%, rgba(74, 111, 165, 0.01) 100%);
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(74, 111, 165, 0.15);
+        width: 100%;
+        max-width: 450px;
+        overflow: hidden;
+        border: 1px solid rgba(74, 111, 165, 0.1);
+        transition: var(--transition);
+    }
+
+    .auth-card:hover {
+        box-shadow: 0 20px 60px rgba(74, 111, 165, 0.2);
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.3;
+    }
+
+    .auth-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .auth-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .auth-body {
+        padding: 2.5rem 2rem;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control-custom:focus {
+        outline: none;
+        border-color: var(--primary);
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+    }
+
+    .password-container {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #7f8c8d;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease;
+        z-index: 10;
+    }
+
+    .toggle-password:hover {
+        color: var(--primary);
+    }
+
+    .auth-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .auth-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .auth-link:hover {
+        color: var(--secondary);
+        text-decoration: underline;
+    }
+
+    .message-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-custom {
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    .alert-error {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        color: #c0392b;
+    }
+
+    .alert-success {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid rgba(46, 204, 113, 0.3);
+        color: #27ae60;
+    }
+
+    .alert-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .login-features {
+        background: linear-gradient(135deg, rgba(56, 178, 172, 0.05) 0%, rgba(56, 178, 172, 0.02) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid var(--success);
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .feature-icon {
+        color: var(--success);
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .feature-text {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container fade-in">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <h1 class="auth-title">Добро пожаловать!</h1>
+            <p class="auth-subtitle">Войдите в свой аккаунт LIFE BALANCE</p>
+        </div>
+
+        <div class="auth-body">
+            <!-- Сообщения -->
+            {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                <div class="alert-custom {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <i
+                        class="bi {% if message.tags == 'error' %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %} alert-icon"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" id="loginForm">
+                {% csrf_token %}
+
+                <!-- Email -->
+                <div class="form-group-custom">
+                    <label for="email" class="form-label">
+                        <i class="bi bi-envelope me-1"></i>Email адрес
+                    </label>
+                    <input type="email" name="email" id="email"
+                        class="form-control-custom {% if field_errors.email %}is-invalid{% endif %}"
+                        value="{{ email|default:'' }}" required placeholder="ваш@email.com" autocomplete="email">
+                    {% if field_errors.email %}
+                    <div class="text-danger small mt-1">{{ field_errors.email }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Пароль -->
+                <div class="form-group-custom">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-key me-1"></i>Пароль
+                    </label>
+                    <div class="password-container">
+                        <input type="password" name="password" id="password"
+                            class="form-control-custom {% if field_errors.password %}is-invalid{% endif %}" required
+                            placeholder="Введите ваш пароль" autocomplete="current-password">
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if field_errors.password %}
+                    <div class="text-danger small mt-1">{{ field_errors.password }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Общие ошибки -->
+                {% if field_errors.non_field %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ field_errors.non_field }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+                <!-- Ссылка на восстановление пароля -->
+                <div class="text-center mt-2">
+                    <a href="{% url 'password_reset' %}" class="auth-link" style="font-size: 0.9rem;">
+                        <i class="bi bi-question-circle me-1"></i>Забыли пароль?
+                    </a>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Войти в систему
+                </button>
+            </form>
+
+            <!-- Блок с преимуществами -->
+            <div class="login-features">
+                <h6 class="mb-3" style="color: var(--success);">
+                    <i class="bi bi-stars me-1"></i>Что вас ждет внутри:
+                </h6>
+                <div class="feature-item">
+                    <i class="bi bi-pie-chart feature-icon"></i>
+                    <span class="feature-text">Колесо жизненного баланса</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-flag feature-icon"></i>
+                    <span class="feature-text">Постановка и отслеживание целей</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-journal-text feature-icon"></i>
+                    <span class="feature-text">Личный дневник для рефлексии</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-graph-up feature-icon"></i>
+                    <span class="feature-text">Аналитика и визуализация прогресса</span>
+                </div>
+            </div>
+
+            <div class="auth-footer">
+                <p>
+                    Ещё нет аккаунта?
+                    <a href="{% url 'register' %}" class="auth-link">Зарегистрируйтесь сейчас</a>
+                </p>
+                <p class="mt-2 small text-muted">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Ваши данные защищены и никогда не передаются третьим лицам
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Функция для показа/скрытия пароля
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = togglePassword.querySelector('i');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Меняем иконку
+            if (type === 'password') {
+                eyeIcon.className = 'bi bi-eye';
+                togglePassword.setAttribute('aria-label', 'Показать пароль');
+            } else {
+                eyeIcon.className = 'bi bi-eye-slash';
+                togglePassword.setAttribute('aria-label', 'Скрыть пароль');
+            }
+
+            // Возвращаем фокус на поле пароля
+            passwordInput.focus();
+        });
+
+        // Валидация формы
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', function (e) {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!email || !password) {
+                e.preventDefault();
+                // Показываем сообщение об ошибке
+                if (!document.querySelector('.alert-error')) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'alert-custom alert-error';
+                    errorDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle alert-icon"></i>
+                    Пожалуйста, заполните все поля
+                `;
+                    document.querySelector('.message-container').prepend(errorDiv);
+                }
+            }
+        });
+
+        // Фокус на поле email при загрузке
+        document.getElementById('email').focus();
+
+        // Анимация появления формы
+        const formElements = document.querySelectorAll('.form-group-custom');
+        formElements.forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, index * 100 + 200);
+        });
+    });
+</script>
+{% endblock %}

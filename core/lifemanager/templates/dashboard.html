@@ -1,0 +1,1573 @@
+{% extends 'base.html' %}
+{% load json_extras %}
+{% block title %}Главная — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<!-- Шрифт для кириллицы -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+    .dashboard-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(74, 111, 165, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-top: 5px solid var(--primary);
+        transition: var(--transition);
+    }
+
+    .dashboard-section:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(74, 111, 165, 0.12);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid rgba(74, 111, 165, 0.1);
+    }
+
+    .section-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    .section-link {
+        color: var(--primary);
+        font-size: 0.95rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        transition: var(--transition);
+    }
+
+    .section-link:hover {
+        color: var(--secondary);
+    }
+
+    .section-link i {
+        margin-left: 5px;
+    }
+
+    .welcome-card {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        border-radius: 16px;
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(74, 111, 165, 0.2);
+    }
+
+    .welcome-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .reminder-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+    }
+
+    .reminder-item:hover {
+        background-color: rgba(74, 111, 165, 0.03);
+        padding-left: 10px;
+        padding-right: 10px;
+        margin: 0 -10px;
+        border-radius: 8px;
+    }
+
+    .reminder-status {
+        font-size: 0.85rem;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .reminder-status.active {
+        background-color: rgba(46, 204, 113, 0.15);
+        color: #27ae60;
+    }
+
+    .reminder-status.inactive {
+        background-color: rgba(236, 240, 241, 0.8);
+        color: #7f8c8d;
+    }
+
+    .goal-progress-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+    }
+
+    .goal-progress-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .goal-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .goal-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+        font-size: 1.05rem;
+    }
+
+    .goal-percentage {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .progress-bar-custom {
+        height: 10px;
+        background-color: #ecf0f1;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+        border-radius: 5px;
+        transition: width 1s ease-in-out;
+    }
+
+    .goal-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .chart-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .assessment-bar {
+        height: 40px;
+        background: linear-gradient(90deg, rgba(74, 111, 165, 0.1) 0%, rgba(74, 111, 165, 0.2) 100%);
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 0.5rem;
+        transition: var(--transition);
+    }
+
+    .assessment-bar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .assessment-fill {
+        height: 100%;
+        border-radius: 8px;
+        transition: width 1s ease-in-out;
+    }
+
+    .assessment-label {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        font-weight: 600;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+
+    .assessment-value {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        font-weight: 700;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+
+    .chart-dates {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #888;
+        margin-top: 0.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #7f8c8d;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #bdc3c7;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: #34495e;
+    }
+
+    .empty-state-text {
+        margin-bottom: 1.5rem;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .dashboard-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+    }
+
+    .dashboard-col {
+        flex: 1;
+        padding: 0 10px;
+        min-width: 300px;
+    }
+
+    /* Стили для колеса жизни */
+    .history-navigation {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid #e9ecef;
+    }
+
+    .wheel-container {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .wheel-canvas-container {
+        flex: 0 0 auto;
+        width: 350px;
+        height: 350px;
+    }
+
+    /* Блок сравнения (вынесен отдельно) */
+    .comparison-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(74, 111, 165, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-top: 5px solid var(--primary);
+        transition: var(--transition);
+    }
+
+    .comparison-section:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(74, 111, 165, 0.12);
+    }
+
+    .comparison-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid rgba(74, 111, 165, 0.1);
+    }
+
+    .comparison-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    .comparison-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .comparison-card {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        height: 100%;
+    }
+
+    .comparison-card .card-body {
+        padding: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .comparison-card .card-title {
+        color: var(--primary);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .comparison-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+        gap: 10px;
+    }
+
+    .comparison-item:last-child {
+        border-bottom: none;
+    }
+
+    .comparison-change {
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .change-positive {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .change-negative {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    .change-neutral {
+        background-color: rgba(108, 117, 125, 0.15);
+        color: #6c757d;
+        border: 1px solid rgba(108, 117, 125, 0.3);
+    }
+
+    .sphere-change-list {
+        margin-top: 15px;
+    }
+
+    .sphere-change-list h6 {
+        font-size: 0.9rem;
+        color: #495057;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+    }
+
+    .date-badge {
+        background: var(--primary);
+        color: white;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-block;
+        margin-left: 8px;
+    }
+
+    /* Улучшенные стили для блока сравнения */
+    #comparisonText {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        padding: 20px;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    #comparisonText .alert {
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: none;
+        background: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid transparent;
+    }
+
+    #comparisonText .alert-success {
+        border-left-color: #28a745;
+    }
+
+    #comparisonText .alert-info {
+        border-left-color: #17a2b8;
+    }
+
+    #comparisonText .alert-warning {
+        border-left-color: #ffc107;
+    }
+
+    #comparisonText .alert-secondary {
+        border-left-color: #6c757d;
+    }
+
+    #comparisonText .alert strong {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    #comparisonText .alert small {
+        font-size: 0.85rem;
+        color: #6c757d;
+        display: block;
+        margin-top: 10px;
+    }
+
+    #comparisonText .sphere-change-list {
+        margin-top: 20px;
+    }
+
+    #comparisonText .sphere-change-list h6 {
+        font-size: 0.95rem;
+        color: #495057;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    #comparisonText .comparison-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e9ecef;
+        background: #fff;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        transition: all 0.2s ease;
+    }
+
+    #comparisonText .comparison-item:hover {
+        background: #f8f9fa;
+        transform: translateX(2px);
+    }
+
+    #comparisonText .comparison-item:last-child {
+        border-bottom: none;
+    }
+
+    #comparisonText .comparison-change {
+        padding: 6px 10px;
+        min-width: 65px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 4px;
+    }
+
+    .no-history-message {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+        width: 100%;
+    }
+
+    .no-history-message i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #adb5bd;
+    }
+
+    .export-container {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 992px) {
+        .wheel-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .comparison-stats {
+            width: 100%;
+            max-width: 400px;
+            max-height: 350px;
+        }
+
+        .wheel-canvas-container {
+            width: 320px;
+            height: 320px;
+        }
+
+        .comparison-section {
+            margin-top: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .history-navigation .d-flex {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-navigation .btn-group {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .wheel-canvas-container {
+            width: 300px;
+            height: 300px;
+        }
+
+        .dashboard-col {
+            min-width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .wheel-canvas-container {
+            width: 280px;
+            height: 280px;
+        }
+
+        .comparison-stats {
+            max-height: 300px;
+        }
+
+        .comparison-card .card-body {
+            padding: 15px;
+            max-height: 280px;
+        }
+
+        #comparisonText {
+            padding: 15px;
+            font-size: 0.85rem;
+        }
+    }
+
+    /* === НОВЫЕ СТИЛИ ДЛЯ БЛОКА РЕКОМЕНДАЦИЙ === */
+    #recommendationsSection {
+        background: #FFF8DC;
+        /* светло-желтый фон, как на фото */
+        border: 1px solid #FFEBCD;
+        /* тонкая рамка */
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+    }
+
+    #recommendationsSection:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    #recommendationsSection .section-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 220, 170, 0.3);
+        /* тонкая линия под заголовком */
+    }
+
+    #recommendationsSection .section-title {
+        color: #B8860B;
+        /* темно-золотой цвет, как на фото */
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    #recommendationsText {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #5C4033;
+        /* темно-коричневый цвет текста */
+        padding: 1rem;
+        background: #FFF8DC;
+        border-radius: 8px;
+    }
+
+    #recommendationsText .recommendations-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #B8860B;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #recommendationsText .recommendations-title i {
+        font-size: 1.2rem;
+        color: #B8860B;
+    }
+
+    #recommendationsText .recommendation-item {
+        margin-bottom: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 220, 170, 0.2);
+    }
+
+    #recommendationsText .recommendation-item:last-child {
+        border-bottom: none;
+    }
+
+    #recommendationsText .recommendation-item strong {
+        color: #B8860B;
+        font-weight: 600;
+    }
+
+    #recommendationsText .recommendation-item p {
+        margin: 0.5rem 0 0 0;
+        text-indent: 0;
+    }
+
+    #recommendationsText .goal-reminder {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 220, 170, 0.2);
+        border-radius: 8px;
+        border-left: 4px solid #FFA500;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    #recommendationsText .goal-reminder i {
+        color: #FFA500;
+        margin-right: 8px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="fade-in">
+    <!-- Приветствие -->
+    <div class="welcome-card">
+        <h1 class="welcome-title">🌟 Добро пожаловать, {{ user.name }}!</h1>
+        <p class="welcome-subtitle">Это ваш личный центр осознанности. Здесь вы видите баланс жизни, прогресс и динамику
+            изменений.</p>
+    </div>
+    <div class="dashboard-row">
+        <!-- Левая колонка -->
+        <div class="dashboard-col">
+            <!-- Напоминания -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="bi bi-bell"></i> Мои напоминания</h2>
+                    <a href="{% url 'reminder_list' %}" class="section-link me-3">
+                        Все <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a href="{% url 'create_reminder' %}" class="section-link">
+                        Добавить <i class="bi bi-plus-circle"></i>
+                    </a>
+                </div>
+                {% if user.reminder_set.all %}
+                {% for reminder in user.reminder_set.all %}
+                <div class="reminder-item">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            {% if reminder.type == 'daily' %}
+                            <i class="bi bi-calendar-day text-primary" style="font-size: 1.5rem;"></i>
+                            {% elif reminder.type == 'weekly' %}
+                            <i class="bi bi-calendar-week text-info" style="font-size: 1.5rem;"></i>
+                            {% else %}
+                            <i class="bi bi-calendar-check text-success" style="font-size: 1.5rem;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ reminder.get_type_display }}</strong>
+                                    {% if reminder.goal %}
+                                    <span class="badge bg-primary ms-2">{{ reminder.goal.title }}</span>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'toggle_reminder' reminder.id %}" class="text-decoration-none ms-3">
+                                    {% if reminder.is_enabled %}
+                                    <span class="reminder-status active">
+                                        <i class="bi bi-bell-fill me-1"></i>Вкл
+                                    </span>
+                                    {% else %}
+                                    <span class="reminder-status inactive">
+                                        <i class="bi bi-bell-slash me-1"></i>Выкл
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </div>
+                            <div class="text-muted small mt-1">
+                                <i class="bi bi-clock me-1"></i>В {{ reminder.time }}
+                                {% if reminder.type == 'deadline_based' and reminder.goal %}
+                                • Дедлайн: {{ reminder.goal.deadline|date:"d.m.Y" }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-bell-slash"></i></div>
+                    <h3 class="empty-state-title">Нет напоминаний</h3>
+                    <p class="empty-state-text">Напоминания помогут вам не забывать о важных действиях и регулярной
+                        рефлексии</p>
+                    <a href="{% url 'create_reminder' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Настроить напоминания
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <!-- Колесо жизни -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="bi bi-pie-chart"></i> Колесо жизни</h2>
+                    <a href="{% url 'assessment_history' %}" class="section-link">
+                        Подробная история <i class="bi bi-clock-history"></i>
+                    </a>
+                </div>
+                <p class="text-muted mb-3" id="wheelDateLabel">Ваш текущий баланс по ключевым сферам</p>
+                <!-- Навигация по истории -->
+                {% if all_dates|length > 1 %}
+                <div class="history-navigation mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <div class="d-flex align-items-center">
+                            <span class="me-2"><i class="bi bi-calendar3"></i> История:</span>
+                            <select id="dateSelector" class="form-select form-select-sm" style="width: 160px;">
+                                {% for date_str in all_dates %}
+                                <option value="{{ date_str }}" {% if forloop.first %}selected{% endif %}>
+                                    {{ date_str|slice:"8:10" }}.{{ date_str|slice:"5:7" }}.{{ date_str|slice:"0:4" }}
+                                    {% if forloop.first %}(последняя){% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary" id="prevDate">
+                                <i class="bi bi-chevron-left"></i> Ранее
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" id="todayDate">
+                                Сегодня
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="nextDate" disabled>
+                                Позже <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Сравнение с последней оценкой -->
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="compareToggle" checked>
+                        <label class="form-check-label" for="compareToggle">
+                            <i class="bi bi-graph-up-arrow"></i> Сравнить с последней оценкой
+                        </label>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="wheel-container">
+                    <div class="wheel-canvas-container">
+                        <canvas id="lifeWheel"></canvas>
+                    </div>
+                </div>
+                <!-- Кнопка экспорта -->
+                <div class="export-container">
+                    <button id="export-wheel-pdf" class="btn btn-outline-primary">
+                        <i class="bi bi-file-earmark-pdf me-2"></i>Экспорт диаграммы в PDF
+                    </button>
+                </div>
+            </div>
+            <!-- 🔹 БЛОК РЕКОМЕНДАЦИЙ (улучшенный дизайн) -->
+            <div class="dashboard-section" id="recommendationsSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="bi bi-lightbulb"></i> Рекомендации</h2>
+                </div>
+                <div id="recommendationsText"></div>
+            </div>
+        </div>
+        <!-- Правая колонка -->
+        <div class="dashboard-col">
+            <!-- Прогресс по целям -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="bi bi-flag"></i> Активные цели</h2>
+                    <a href="{% url 'goal_list' %}" class="section-link">
+                        Все цели <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                {% if active_goals %}
+                {% for goal in active_goals %}
+                <div class="goal-progress-card">
+                    <div class="goal-progress-header">
+                        <h3 class="goal-title">{{ goal.title }}</h3>
+                        <span class="goal-percentage">{{ goal.progress }}%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: {{ goal.progress }}%"></div>
+                    </div>
+                    <div class="goal-meta">
+                        <span><i class="bi bi-calendar"></i> {{ goal.deadline|date:"d E Y" }}</span>
+                        <span><i class="bi bi-tag"></i> {{ goal.sphere.title }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-flag"></i></div>
+                    <h3 class="empty-state-title">Нет активных целей</h3>
+                    <p class="empty-state-text">Цели придают направление вашему развитию и помогают фокусироваться на
+                        важном</p>
+                    <a href="{% url 'create_goal' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Создать первую цель
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <!-- График динамики -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="bi bi-graph-up"></i> Динамика оценок</h2>
+                </div>
+                {% if chart_series %}
+                <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                    {% for series in chart_series %}
+                    <div class="mb-4">
+                        <h5 style="color: {{ series.color }}; font-weight: 600; font-size: 0.95rem;">
+                            <i class="bi bi-circle-fill" style="font-size: 0.6rem; margin-right: 8px;"></i>
+                            <!-- Исправлено: явная проверка, чтобы избежать экранирования -->
+                            {% with label=series.label %}
+                            {{ label }}
+                            {% endwith %}
+                        </h5>
+
+                        <div class="assessment-bar">
+                            {% with max_val=series.data|slice:"-1"|first %}
+                            <div class="assessment-fill"
+                                 style="width: {% widthratio max_val 10 100 %}%; background: linear-gradient(90deg, {{ series.color }} 0%, {{ series.color }}99 100%);">
+
+                            </div>
+                            {% endwith %}
+                            <div class="assessment-label">{{ series.label }}</div>
+                            <div class="assessment-value">{{ series.data|slice:"-1"|first }}/10</div>
+                        </div>
+
+                        <div class="chart-dates">
+                            {% for date in series.dates %}
+                            <span>{{ date }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state py-4">
+                    <div class="empty-state-icon"><i class="bi bi-bar-chart"></i></div>
+                    <h3 class="empty-state-title">Нет данных для динамики</h3>
+                    <p class="empty-state-text">Регулярная оценка сфер покажет, как меняется ваш баланс со временем</p>
+                    <a href="{% url 'sphere_list' %}" class="btn btn-primary">
+                        <i class="bi bi-pie-chart"></i> Оценить сферы
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Блок сравнения (вынесен отдельно под динамикой оценок) -->
+            <div class="comparison-section" id="comparisonSection" style="display: none;">
+                <div class="comparison-header">
+                    <h2 class="comparison-title"><i class="bi bi-arrow-left-right"></i> Анализ изменений</h2>
+                    <div class="comparison-toggle">
+                    </div>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-body">
+                        <div id="comparisonText"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- html2canvas и jspdf -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const lifeWheelCtx = document.getElementById('lifeWheel').getContext('2d');
+        const wheelDateLabel = document.getElementById('wheelDateLabel');
+        const comparisonSection = document.getElementById('comparisonSection');
+        const comparisonText = document.getElementById('comparisonText');
+        const recommendationsSection = document.getElementById('recommendationsSection');
+        const recommendationsText = document.getElementById('recommendationsText');
+
+        // Для отладки - проверяем данные
+        console.log('Данные из Django:', {
+            latestData: {{ latest_assessments| safe_json }},
+        allDates: {{ all_dates| safe_json }},
+        allSpheres: {{ all_spheres| safe_json }}
+    });
+
+    // Данные из Django
+    const latestData = {{ latest_assessments| safe_json }};
+    const allDataByDate = {{ all_assessments_by_date| safe_json }};
+    const allDates = {{ all_dates| safe_json }};
+    const allSpheres = {{ all_spheres| safe_json }};
+
+    // Если нет данных
+    if (!latestData || Object.keys(latestData).length === 0 || allDates.length === 0) {
+        const canvasContainer = document.querySelector('.wheel-canvas-container');
+        if (canvasContainer) {
+            canvasContainer.innerHTML = `
+                <div class="no-history-message">
+                    <i class="bi bi-calendar-x"></i>
+                    <h5>Нет данных для отображения</h5>
+                    <p>Оцените сферы жизни, чтобы увидеть колесо жизни и его историю</p>
+                    <a href="{% url 'sphere_list' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pie-chart"></i> Оценить сферы
+                    </a>
+                </div>
+            `;
+        }
+        return;
+    }
+
+    // Текущее состояние
+    let currentDateIndex = 0;
+    let isComparing = true;
+    let currentChart = null;
+
+    // Цвета
+    const sphereColors = [
+        'rgba(74, 111, 165, 0.8)',
+        'rgba(107, 142, 35, 0.8)',
+        'rgba(56, 178, 172, 0.8)',
+        'rgba(231, 76, 60, 0.8)',
+        'rgba(155, 89, 182, 0.8)',
+        'rgba(241, 196, 15, 0.8)',
+        'rgba(230, 126, 34, 0.8)',
+        'rgba(52, 73, 94, 0.8)'
+    ];
+
+    // Функция создания/обновления диаграммы
+    function updateChart(dateIndex) {
+        const currentDate = allDates[dateIndex];
+        const currentData = allDataByDate[currentDate] || {};
+        const latestData = allDataByDate[allDates[0]] || {};
+
+        // Подготовка данных
+        const labels = allSpheres;
+        const currentValues = allSpheres.map(sphere => currentData[sphere] || 0);
+        const latestValues = allSpheres.map(sphere => latestData[sphere] || 0);
+
+        console.log('Создание диаграммы для даты:', currentDate);
+        console.log('Данные:', currentData);
+        console.log('Labels:', labels);
+        console.log('Values:', currentValues);
+
+        // Создаем наборы данных
+        const datasets = [{
+            label: `Оценка на ${formatDate(currentDate)}`,
+            data: currentValues,
+            fill: true,
+            backgroundColor: 'rgba(74, 111, 165, 0.2)',
+            borderColor: '#4A6FA5',
+            pointBackgroundColor: sphereColors.slice(0, labels.length),
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#4A6FA5',
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            borderWidth: 2
+        }];
+
+        // Если включено сравнение и не текущая дата
+        if (isComparing && dateIndex > 0) {
+            datasets.push({
+                label: `Для сравнения: ${formatDate(allDates[0])}`,
+                data: latestValues,
+                fill: false,
+                borderColor: 'rgba(231, 76, 60, 0.6)',
+                borderDash: [5, 5],
+                pointBackgroundColor: 'rgba(231, 76, 60, 0.6)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(231, 76, 60, 0.8)',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                borderWidth: 1
+            });
+        }
+
+        // Обновляем или создаем диаграмму
+        if (currentChart) {
+            currentChart.data.labels = labels;
+            currentChart.data.datasets = datasets;
+            currentChart.update();
+        } else {
+            try {
+                currentChart = new Chart(lifeWheelCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 10,
+                                ticks: {
+                                    stepSize: 2,
+                                    font: {
+                                        family: "'Open Sans', sans-serif"
+                                    }
+                                },
+                                pointLabels: {
+                                    font: {
+                                        family: "'Montserrat', sans-serif",
+                                        size: 11,
+                                        weight: '500'
+                                    },
+                                    color: '#2c3e50'
+                                },
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        family: "'Open Sans', sans-serif",
+                                        size: 12
+                                    },
+                                    padding: 20,
+                                    boxWidth: 12
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(44, 62, 80, 0.9)',
+                                titleFont: {
+                                    family: "'Montserrat', sans-serif"
+                                },
+                                bodyFont: {
+                                    family: "'Open Sans', sans-serif"
+                                },
+                                mode: 'index',
+                                intersect: false
+                            }
+                        }
+                    }
+                });
+                console.log('Диаграмма создана успешно');
+            } catch (error) {
+                console.error('Ошибка при создании диаграммы:', error);
+                // Показываем сообщение об ошибке
+                const canvasContainer = document.querySelector('.wheel-canvas-container');
+                if (canvasContainer) {
+                    canvasContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            <h5>Ошибка при создании диаграммы</h5>
+                            <p>${error.message}</p>
+                            <p>Пожалуйста, обновите страницу или проверьте данные.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Обновляем метку даты
+        updateDateLabel(currentDate, dateIndex);
+
+        // Обновляем статистику сравнения
+        if (dateIndex > 0 && isComparing) {
+            updateComparisonStats(currentData, latestData, currentDate, allDates[0]);
+            comparisonSection.style.display = 'block';
+            recommendationsSection.style.display = 'block';
+        } else {
+            comparisonSection.style.display = 'none';
+            recommendationsSection.style.display = 'none';
+        }
+
+        // Обновляем состояние кнопок навигации
+        updateNavigationButtons(dateIndex);
+    }
+
+    // Функция обновления метки даты
+    function updateDateLabel(dateStr, index) {
+        const date = new Date(dateStr + 'T00:00:00');
+        const today = new Date();
+        const isToday = date.toDateString() === today.toDateString();
+        let label = `Оценка от ${formatDate(dateStr)}`;
+        if (index === 0) {
+            label += ' <span class="date-badge">Последняя</span>';
+        } else if (isToday) {
+            label += ' <span class="date-badge">Сегодня</span>';
+        }
+        wheelDateLabel.innerHTML = label;
+    }
+
+    // Функция обновления статистики сравнения — ТОЧНО КАК В ТВОЁМ ИСХОДНИКЕ
+    function updateComparisonStats(currentData, latestData, currentDate, latestDate) {
+        let totalChange = 0;
+        let improvedSpheres = 0;
+        let worsenedSpheres = 0;
+        let unchangedSpheres = 0;
+        let totalPoints = 0;
+
+        // Считаем изменения по каждой сфере
+        const sphereChanges = [];
+        allSpheres.forEach((sphere, index) => {
+            const currentValue = currentData[sphere] || 0;
+            const latestValue = latestData[sphere] || 0;
+            const change = latestValue - currentValue;
+            if (currentValue > 0) {
+                totalChange += change;
+                totalPoints++;
+                if (change > 0.5) {
+                    improvedSpheres++;
+                } else if (change < -0.5) {
+                    worsenedSpheres++;
+                } else {
+                    unchangedSpheres++;
+                }
+                sphereChanges.push({
+                    sphere: sphere,
+                    current: currentValue,
+                    latest: latestValue,
+                    change: change,
+                    percentChange: currentValue > 0 ? ((change / currentValue) * 100).toFixed(1) : '0'
+                });
+            }
+        });
+
+        // Формируем текст сравнения — ТОЧНО КАК В ТВОЁМ ИСХОДНИКЕ
+        let comparisonHTML = '';
+        const avgChange = totalPoints > 0 ? (totalChange / totalPoints).toFixed(1) : 0;
+        if (avgChange > 0.5) {
+            comparisonHTML = `
+                <div class="alert alert-success">
+                    <i class="bi bi-arrow-up-circle"></i>
+                    <strong class="d-block ms-3">Отличный прогресс!</strong>
+                    <div class="ms-3">По сравнению с ${formatDate(currentDate)} ваше колесо жизни стало более сбалансированным.</div>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="bi bi-check-circle"></i> Улучшено сфер: ${improvedSpheres}<br>
+                        <i class="bi bi-dash-circle"></i> Без изменений: ${unchangedSpheres}<br>
+                        <i class="bi bi-exclamation-circle"></i> Снизилось: ${worsenedSpheres}
+                    </small>
+                </div>
+            `;
+        } else if (avgChange > 0.1) {
+            comparisonHTML = `
+                <div class="alert alert-info">
+                    <i class="bi bi-arrow-up-right"></i>
+                    <strong class="d-block ms-2">Положительная динамика!</strong>
+                    <div class="ms-2">Небольшое улучшение по сравнению с ${formatDate(currentDate)}.</div>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="bi bi-check-circle"></i> Улучшено сфер: ${improvedSpheres}<br>
+                        <i class="bi bi-dash-circle"></i> Без изменений: ${unchangedSpheres}<br>
+                        <i class="bi bi-exclamation-circle"></i> Снизилось: ${worsenedSpheres}
+                    </small>
+                </div>
+            `;
+        } else if (avgChange < -0.5) {
+            comparisonHTML = `
+                <div class="alert alert-warning">
+                    <i class="bi bi-arrow-down-circle"></i>
+                    <strong class="d-block ms-2">Внимание к балансу!</strong>
+                    <div class="ms-2">По сравнению с ${formatDate(currentDate)} некоторые сферы требуют внимания.</div>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="bi bi-check-circle"></i> Улучшено сфер: ${improvedSpheres}<br>
+                        <i class="bi bi-dash-circle"></i> Без изменений: ${unchangedSpheres}<br>
+                        <i class="bi bi-exclamation-circle"></i> Снизилось: ${worsenedSpheres}
+                    </small>
+                </div>
+            `;
+        } else {
+            comparisonHTML = `
+                <div class="alert alert-secondary">
+                    <i class="bi bi-dash-circle"></i>
+                    <strong class="d-block ms-2">Стабильность</strong>
+                    <div class="ms-2">Ваше колесо жизни осталось примерно таким же, как и ${formatDate(currentDate)}.</div>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="bi bi-check-circle"></i> Улучшено сфер: ${improvedSpheres}<br>
+                        <i class="bi bi-dash-circle"></i> Без изменений: ${unchangedSpheres}<br>
+                        <i class="bi bi-exclamation-circle"></i> Снизилось: ${worsenedSpheres}
+                    </small>
+                </div>
+            `;
+        }
+
+        // Добавляем детализацию по сферам — ТОЧНО КАК В ТВОЁМ ИСХОДНИКЕ
+        comparisonHTML += `
+            <div class="sphere-change-list">
+                <h6><i class="bi bi-list-ul"></i> Изменения по сферам:</h6>
+        `;
+        // Сортируем по величине изменения
+        sphereChanges.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+        sphereChanges.slice(0, 5).forEach(item => {
+            const changeClass = item.change > 0.5 ? 'change-positive' :
+                item.change < -0.5 ? 'change-negative' : 'change-neutral';
+            const changeIcon = item.change > 0.5 ? '↑' :
+                item.change < -0.5 ? '↓' : '→';
+            const changeSign = item.change > 0 ? '+' : '';
+            comparisonHTML += `
+                <div class="comparison-item">
+                    <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${item.sphere}
+                    </span>
+                    <span class="${changeClass}">
+                        ${changeIcon} ${changeSign}${item.change.toFixed(1)}
+                    </span>
+                </div>
+            `;
+        });
+        comparisonHTML += `</div>`;
+        comparisonText.innerHTML = comparisonHTML;
+
+        // === Блок рекомендаций ===
+        let recommendationsHTML = '';
+        const goalReminder = `<div class="goal-reminder">
+            <i class="bi bi-flag"></i> Не забудьте поставить себе цель для закрепления прогресса или улучшения баланса — это поможет превратить осознанность в реальные действия!
+        </div>`;
+        if (avgChange > 0.5) {
+            recommendationsHTML = `
+                <div class="recommendations-title">
+                    <i class="bi bi-trophy"></i> Вы молодец!
+                </div>
+                <p>Ваша регулярная работа над собой приносит плоды. Продолжайте в том же духе — вы создаёте прочный фундамент для гармоничной жизни.</p>
+                ${goalReminder}
+            `;
+        } else if (avgChange < -0.5) {
+            const problematicSpheres = sphereChanges
+                .filter(item => item.change < -1 || item.latest <= 4)
+                .sort((a, b) => a.change - b.change)
+                .slice(0, 3);
+            if (problematicSpheres.length > 0) {
+                recommendationsHTML += `<div class="recommendations-title">
+                    <i class="bi bi-exclamation-triangle"></i> Рекомендации по улучшению:
+                </div>`;
+                const adviceMap = {
+                    'Здоровье': 'Уделите внимание физической активности, сну и питанию. Даже 20 минут ходьбы в день могут значительно улучшить самочувствие.',
+                    'Карьера': 'Пересмотрите свои профессиональные цели. Возможно, стоит обсудить развитие с руководителем или пройти обучение новому навыку.',
+                    'Финансы': 'Составьте простой бюджет или начните откладывать даже небольшую сумму. Финансовая стабильность снижает стресс.',
+                    'Отношения': 'Выделите время на качество общения с близкими. Иногда достаточно одного искреннего разговора в неделю.',
+                    'Личностный рост': 'Попробуйте читать, вести дневник или изучать что-то новое. Рост начинается с маленьких шагов.',
+                    'Духовность': 'Найдите время для тишины — медитация, прогулка на природе или просто 10 минут без телефона помогут восстановить внутренний баланс.',
+                    'Досуг': 'Разрешите себе отдых без чувства вины. Хобби и развлечения — не роскошь, а необходимость для восстановления энергии.',
+                    'Окружение': 'Оцените, насколько ваше пространство и социальное окружение поддерживают вас. Иногда небольшие изменения в среде дают большой эффект.'
+                };
+                problematicSpheres.forEach(item => {
+                    const advice = adviceMap[item.sphere] || 'Уделите этой сфере немного больше внимания в ближайшее время.';
+                    recommendationsHTML += `
+                        <div class="recommendation-item">
+                            <strong>${item.sphere}:</strong>
+                            <p>${advice}</p>
+                        </div>
+                    `;
+                });
+                recommendationsHTML += `${goalReminder}`;
+            } else {
+                recommendationsHTML = `
+                    <div class="recommendations-title">
+                        <i class="bi bi-exclamation-triangle"></i> Внимание!
+                    </div>
+                    <p>Обратите внимание на сферы с оценкой ниже 5. Даже небольшие шаги могут значительно улучшить ваш баланс.</p>
+                    ${goalReminder}
+                `;
+            }
+        } else {
+            recommendationsHTML = `
+                <div class="recommendations-title">
+                    <i class="bi bi-stars"></i> Поддерживайте баланс
+                </div>
+                <p>Стабильность — уже достижение! Но чтобы двигаться дальше, попробуйте углубиться в одну из сфер, которая вызывает у вас интерес.</p>
+                ${goalReminder}
+            `;
+        }
+        recommendationsText.innerHTML = recommendationsHTML;
+    }
+
+    // Функция обновления кнопок навигации
+    function updateNavigationButtons(index) {
+        const prevBtn = document.getElementById('prevDate');
+        const nextBtn = document.getElementById('nextDate');
+        const todayBtn = document.getElementById('todayDate');
+        const dateSelector = document.getElementById('dateSelector');
+        if (prevBtn) prevBtn.disabled = index >= allDates.length - 1;
+        if (nextBtn) nextBtn.disabled = index <= 0;
+        if (todayBtn) {
+            todayBtn.classList.remove('btn-primary', 'btn-outline-primary');
+            if (index === 0) {
+                todayBtn.classList.add('btn-primary');
+            } else {
+                todayBtn.classList.add('btn-outline-primary');
+            }
+        }
+        if (dateSelector) dateSelector.value = allDates[index];
+    }
+
+    // Форматирование даты
+    function formatDate(dateStr) {
+        try {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    // Инициализация
+    if (allDates.length > 0) {
+        updateChart(currentDateIndex);
+    }
+
+    // Обработчики событий
+    // Кнопка "Ранее"
+    const prevBtn = document.getElementById('prevDate');
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+            if (currentDateIndex < allDates.length - 1) {
+                currentDateIndex++;
+                updateChart(currentDateIndex);
+            }
+        });
+    }
+
+    // Кнопка "Позже"
+    const nextBtn = document.getElementById('nextDate');
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+            if (currentDateIndex > 0) {
+                currentDateIndex--;
+                updateChart(currentDateIndex);
+            }
+        });
+    }
+
+    // Кнопка "Сегодня" (последняя оценка)
+    const todayBtn = document.getElementById('todayDate');
+    if (todayBtn) {
+        todayBtn.addEventListener('click', function () {
+            currentDateIndex = 0;
+            updateChart(currentDateIndex);
+        });
+    }
+
+    // Селектор даты
+    const dateSelector = document.getElementById('dateSelector');
+    if (dateSelector) {
+        dateSelector.addEventListener('change', function () {
+            const selectedDate = this.value;
+            currentDateIndex = allDates.indexOf(selectedDate);
+            if (currentDateIndex !== -1) {
+                updateChart(currentDateIndex);
+            }
+        });
+    }
+
+    // Переключатель сравнения (в навигации)
+    const compareToggle = document.getElementById('compareToggle');
+    if (compareToggle) {
+        compareToggle.addEventListener('change', function () {
+            isComparing = this.checked;
+            updateChart(currentDateIndex);
+        });
+    }
+
+    // Переключатель сравнения (в отдельном блоке)
+    const compareToggleInComparison = document.getElementById('compareToggleInComparison');
+    if (compareToggleInComparison) {
+        compareToggleInComparison.addEventListener('change', function () {
+            isComparing = this.checked;
+            updateChart(currentDateIndex);
+        });
+    }
+
+    // Анимация прогресс-баров
+    const progressBars = document.querySelectorAll('.progress-fill');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 300);
+    });
+
+    // Анимация столбцов диаграммы
+    const assessmentBars = document.querySelectorAll('.assessment-fill');
+    assessmentBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+
+    // Экспорт диграммы с рекомендациями
+    document.getElementById('export-wheel-pdf').addEventListener('click', function () {
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Создание...';
+        btn.disabled = true;
+
+        try {
+            const canvas = document.getElementById('lifeWheel');
+            if (!canvas) throw new Error('Диаграмма не найдена');
+
+            // Получаем дату оценки
+            const dateLabel = (document.getElementById('wheelDateLabel')?.textContent || '').replace(/<[^>]*>/g, '').trim() || 'Без даты';
+
+            // Получаем рекомендации (всегда, если есть содержимое)
+            let recommendationsText = '';
+            const recommendationsEl = document.getElementById('recommendationsText');
+            if (recommendationsEl && recommendationsEl.textContent.trim()) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = recommendationsEl.innerHTML;
+                recommendationsText = tempDiv.innerText.trim();
+            }
+
+            // Преобразуем canvas в base64
+            const imgData = canvas.toDataURL('image/png');
+
+            // Формируем содержимое PDF
+            const content = [
+                { text: 'Колесо жизни', style: 'header', alignment: 'center' },
+                { text: dateLabel, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 15] },
+                { image: imgData, width: 400, height: 350, alignment: 'center', margin: [0, 0, 0, 15] } // Фиксированная высота 350px
+            ];
+
+            // Добавляем рекомендации, если есть
+            if (recommendationsText) {
+                content.push(
+                    { text: 'Рекомендации', style: 'sectionHeader', margin: [0, 0, 0, 8] },
+                    { text: recommendationsText, style: 'bodyText' }
+                );
+            }
+
+            // Определяем стили
+            const docDefinition = {
+                pageSize: 'A4',
+                pageOrientation: 'portrait',
+                pageMargins: [40, 50, 40, 40],
+                content: content,
+                styles: {
+                    header: {
+                        fontSize: 18,
+                        bold: true,
+                        color: '#4A6FA5',
+                        margin: [0, 0, 0, 5]
+                    },
+                    subheader: {
+                        fontSize: 12,
+                        color: '#666666',
+                        italics: true
+                    },
+                    sectionHeader: {
+                        fontSize: 14,
+                        bold: true,
+                        color: '#4A6FA5',
+                        margin: [0, 10, 0, 5]
+                    },
+                    bodyText: {
+                        fontSize: 10,
+                        lineHeight: 1.3,
+                        margin: [0, 0, 0, 10]
+                    }
+                },
+                defaultStyle: {
+                    font: 'Roboto'
+                }
+            };
+
+            // Генерируем и скачиваем PDF
+            pdfMake.createPdf(docDefinition).download('колесо_жизни_' + new Date().toISOString().slice(0, 10) + '.pdf');
+
+            // Успех
+            btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Создано!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
+
+        } catch (error) {
+            console.error('Ошибка при создании PDF:', error);
+            btn.innerHTML = '<i class="bi bi-x-circle me-2"></i>Ошибка!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 3000);
+        }
+    });
+});
+</script>
+{% endblock %}

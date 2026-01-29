@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block title %}История оценок — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .history-header {
+        background: linear-gradient(135deg, rgba(74, 111, 165, 0.1) 0%, rgba(74, 111, 165, 0.05) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--primary);
+    }
+
+    .assessment-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border-left: 4px solid var(--primary);
+        transition: var(--transition);
+    }
+
+    .assessment-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .assessment-score {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
+        color: var(--primary);
+        min-width: 70px;
+        text-align: center;
+    }
+
+    .score-indicator {
+        width: 100%;
+        height: 8px;
+        background: #ecf0f1;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+
+    .score-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s ease-in-out;
+    }
+
+    .sphere-icon-small {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: white;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .assessment-date {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+
+    .empty-history {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #bdc3c7;
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-card {
+        background: linear-gradient(135deg, rgba(56, 178, 172, 0.1) 0%, rgba(56, 178, 172, 0.05) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(56, 178, 172, 0.2);
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
+        color: var(--success);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="history-container fade-in">
+    <!-- Заголовок -->
+    <div class="history-header">
+        <div class="d-flex align-items-center mb-3">
+            <div class="me-3">
+                <i class="bi bi-bar-chart-fill" style="font-size: 2.5rem; color: var(--primary);"></i>
+            </div>
+            <div>
+                <h1 class="display-6 fw-bold mb-2" style="color: var(--primary);">📊 История ваших оценок</h1>
+                <p class="lead mb-0 text-muted">
+                    Это ваш личный трекер прогресса. Здесь вы видите все оценки, которые ставили своим жизненным сферам.
+                    Наблюдайте за динамикой и отмечайте изменения.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% if assessments %}
+        <!-- Статистика -->
+        <div class="stats-card">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ assessments|length }}</div>
+                        <div class="stat-label">Всего оценок</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        {% with last_week_count=assessments|slice:":7"|length %}
+                        <div class="stat-value">{{ last_week_count }}</div>
+                        {% endwith %}
+                        <div class="stat-label">За неделю</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ average_score }}</div>
+                        <div class="stat-label">Средняя оценка</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список оценок -->
+        <div class="mt-4">
+            <h3 class="mb-4" style="color: var(--primary);">
+                <i class="bi bi-list-check me-2"></i>Все оценки
+            </h3>
+
+            {% for assessment in assessments %}
+            <div class="assessment-card">
+                <div class="row align-items-center">
+                    <!-- Балл -->
+                    <div class="col-md-2">
+                        <div class="d-flex flex-column align-items-center">
+                            <div class="assessment-score">
+                                {{ assessment.value }}
+                            </div>
+                            <div class="score-indicator">
+                                <div class="score-fill" style="width: {% widthratio assessment.value 10 100 %}%;
+                                    background:
+                                    {% if assessment.value <= 3 %}
+                                        linear-gradient(90deg, #e74c3c, #e67e22)
+                                    {% elif assessment.value <= 5 %}
+                                        linear-gradient(90deg, #e67e22, #f1c40f)
+                                    {% elif assessment.value <= 7 %}
+                                        linear-gradient(90deg, #2ecc71, #27ae60)
+                                    {% else %}
+                                        linear-gradient(90deg, #3498db, #2c3e50)
+                                    {% endif %};">
+                                </div>
+                            </div>
+                            <small class="text-muted mt-1">из 10</small>
+                        </div>
+                    </div>
+
+                    <!-- Информация -->
+                    <div class="col-md-10">
+                        <div class="d-flex align-items-center">
+                            <!-- Иконка сферы -->
+                            <div class="sphere-icon-small" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
+                                {% if assessment.sphere.title == "Здоровье" %}
+                                    <i class="bi bi-heart-pulse"></i>
+                                {% elif assessment.sphere.title == "Финансы" %}
+                                    <i class="bi bi-cash-stack"></i>
+                                {% elif assessment.sphere.title == "Карьера" %}
+                                    <i class="bi bi-briefcase"></i>
+                                {% elif assessment.sphere.title == "Отношения" %}
+                                    <i class="bi bi-people"></i>
+                                {% elif assessment.sphere.title == "Семья" %}
+                                    <i class="bi bi-house-heart"></i>
+                                {% elif assessment.sphere.title == "Личностный рост" %}
+                                    <i class="bi bi-lightbulb"></i>
+                                {% elif assessment.sphere.title == "Духовность" %}
+                                    <i class="bi bi-flower1"></i>
+                                {% elif assessment.sphere.title == "Отдых и развлечения" %}
+                                    <i class="bi bi-emoji-smile"></i>
+                                {% else %}
+                                    <i class="bi bi-circle"></i>
+                                {% endif %}
+                            </div>
+
+                            <!-- Детали -->
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1" style="color: var(--primary);">{{ assessment.sphere.title }}</h5>
+                                <div class="assessment-date">
+                                    <i class="bi bi-calendar me-1"></i>{{ assessment.date|date:"d E Y" }}
+                                </div>
+                                {% if assessment.comment %}
+                                <p class="mb-0 mt-2 small text-muted">
+                                    <i class="bi bi-chat-left-text me-1"></i>{{ assessment.comment }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Состояние без оценок -->
+        <div class="empty-history">
+            <div class="empty-icon">
+                <i class="bi bi-bar-chart"></i>
+            </div>
+            <h3 class="mb-3" style="color: var(--primary);">История оценок пуста</h3>
+            <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+                Вы ещё не оценивали свои сферы жизни. Начните с оценки хотя бы одной сферы,
+                чтобы отслеживать свой прогресс и видеть динамику изменений.
+            </p>
+            <a href="{% url 'sphere_list' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-pie-chart me-2"></i>Начать оценку
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Кнопка возврата -->
+    <div class="text-center mt-5">
+        <a href="{% url 'sphere_list' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Вернуться к оценке сфер
+        </a>
+    </div>
+</div>
+
+<script>
+// Анимация прогресс-баров при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const scoreFills = document.querySelectorAll('.score-fill');
+    scoreFills.forEach(fill => {
+        const width = fill.style.width;
+        fill.style.width = '0%';
+        setTimeout(() => {
+            fill.style.width = width;
+        }, 300);
+    });
+
+    // Подсчет средней оценки (на клиенте, если нужно)
+    const assessments = {{ assessments|safe }};
+    if (assessments && assessments.length > 0) {
+        let sum = 0;
+        assessments.forEach(a => {
+            sum += a.value;
+        });
+        const avg = (sum / assessments.length).toFixed(1);
+        // Можно обновить элемент со средней оценкой, если нужно
+    }
+});
+</script>
+{% endblock %}

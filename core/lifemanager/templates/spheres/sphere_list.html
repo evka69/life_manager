@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% block title %}Оцените свои жизненные сферы — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sphere-card {
+        border: none;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 8px 30px rgba(74, 111, 165, 0.08);
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+        overflow: hidden;
+        border-left: 5px solid var(--primary);
+    }
+
+    .sphere-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(74, 111, 165, 0.15);
+    }
+
+    .sphere-header {
+        background: linear-gradient(135deg, rgba(74, 111, 165, 0.1) 0%, rgba(74, 111, 165, 0.05) 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .sphere-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .sphere-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .sphere-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .sphere-body {
+        padding: 1.5rem;
+    }
+
+    .today-card {
+        background: linear-gradient(135deg, rgba(56, 178, 172, 0.1) 0%, rgba(56, 178, 172, 0.05) 100%);
+        border: 2px solid rgba(56, 178, 172, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .today-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        color: var(--success);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .assessment-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        margin-left: 1rem;
+    }
+
+    .assessment-badge.assessed {
+        background-color: rgba(46, 204, 113, 0.15);
+        color: #27ae60;
+    }
+
+    .assessment-badge.not-assessed {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+    }
+
+    .empty-spheres {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    }
+
+    .empty-icon {
+        font-size: 3.5rem;
+        color: #bdc3c7;
+        margin-bottom: 1.5rem;
+    }
+
+    .history-link {
+        display: inline-flex;
+        align-items: center;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        background: rgba(74, 111, 165, 0.1);
+        transition: var(--transition);
+    }
+
+    .history-link:hover {
+        background: rgba(74, 111, 165, 0.15);
+        color: var(--primary);
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+        /* Кнопка-переключатель сортировки */
+    .sort-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .sort-toggle-btn:hover {
+        background: rgba(74, 111, 165, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .sort-toggle-btn.active {
+        background: white;
+        color: var(--primary);
+        box-shadow: 0 2px 6px rgba(74, 111, 165, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Заголовок и описание -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold mb-3" style="color: var(--primary);">
+            <i class="bi bi-pie-chart-fill me-2"></i>Оцените баланс своей жизни
+        </h1>
+        <p class="lead text-muted mx-auto" style="max-width: 800px; line-height: 1.6;">
+            Каждый день — это шанс лучше понять себя. Оцените ключевые сферы вашей жизни по шкале от 1 до 10.
+            Это займёт всего 2–3 минуты, но даст ясную картину того, где вы сейчас, и куда стоит направить внимание.
+        </p>
+    </div>
+
+    <!-- Карточка сегодняшней даты -->
+<div class="today-card">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h3 class="today-title">
+                <i class="bi bi-calendar-check me-2"></i>Сегодня: {{ today|date:"d E Y" }}
+            </h3>
+            {% if assessed_today %}
+                <p class="mb-0 text-success">
+                    <i class="bi bi-check-circle-fill me-2"></i>Вы уже оценили некоторые сферы сегодня. Молодец!
+                </p>
+            {% else %}
+                <p class="mb-0 text-muted">
+                    <i class="bi bi-info-circle me-2"></i>Начните с любой сферы. Регулярная оценка — ключ к осознанности.
+                </p>
+            {% endif %}
+        </div>
+        <div class="col-md-4 text-md-end">
+            <!-- Кнопка-переключатель сортировки -->
+<a href="{% if sort_by == 'alpha' %}{% url 'sphere_list' %}{% else %}{% url 'sphere_list' %}?sort=alpha{% endif %}"
+   class="sort-toggle-btn {% if sort_by == 'alpha' %}active{% endif %}"
+   title="{% if sort_by == 'alpha' %}Исходный порядок{% else %}Сортировать по алфавиту{% endif %}">
+    {% if sort_by == 'alpha' %}
+        <i class="bi bi-sort-numeric-down"></i>
+    {% else %}
+        <i class="bi bi-sort-alpha-down"></i>
+    {% endif %}
+</a>
+            <a href="{% url 'assessment_history' %}" class="history-link">
+                <i class="bi bi-clock-history me-2"></i>История
+            </a>
+        </div>
+    </div>
+</div>
+
+    <!-- Проверяем, что spheres существует и это список -->
+    {% if spheres %}
+        <!-- Если spheres - это QuerySet или список -->
+        {% if spheres|length > 0 %}
+            <!-- Сетка сфер -->
+            <div class="row g-4">
+                {% for sphere in spheres %}
+                <div class="col-lg-6">
+                    <div class="sphere-card">
+                        <div class="sphere-header">
+                            <div class="d-flex align-items-start">
+                                <!-- Иконка сферы -->
+                                <div class="sphere-icon" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white;">
+                                    {% if sphere.title == "Здоровье" %}
+                                        <i class="bi bi-heart-pulse"></i>
+                                    {% elif sphere.title == "Финансы" %}
+                                        <i class="bi bi-cash-stack"></i>
+                                    {% elif sphere.title == "Карьера" %}
+                                        <i class="bi bi-briefcase"></i>
+                                    {% elif sphere.title == "Отношения" %}
+                                        <i class="bi bi-people"></i>
+                                    {% elif sphere.title == "Семья" %}
+                                        <i class="bi bi-house-heart"></i>
+                                    {% elif sphere.title == "Личностный рост" %}
+                                        <i class="bi bi-lightbulb"></i>
+                                    {% elif sphere.title == "Духовность" %}
+                                        <i class="bi bi-flower1"></i>
+                                    {% elif sphere.title == "Отдых и развлечения" %}
+                                        <i class="bi bi-emoji-smile"></i>
+                                    {% else %}
+                                        <i class="bi bi-circle"></i>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Заголовок и описание -->
+                                <div class="flex-grow-1">
+                                    <h3 class="sphere-title">{{ sphere.title }}</h3>
+                                    <p class="sphere-description mb-0">
+                                        {% if sphere.title == "Здоровье" %}
+                                            Как вы себя чувствуете? Энергия, сон, питание, физическая активность.
+                                        {% elif sphere.title == "Финансы" %}
+                                            Уверенность в финансовом будущем, стабильность дохода, долги, сбережения.
+                                        {% elif sphere.title == "Карьера" %}
+                                            Удовлетворённость работой, рост, признание, баланс работы и личной жизни.
+                                        {% elif sphere.title == "Отношения" %}
+                                            Близость, доверие, поддержка в романтических или дружеских отношениях.
+                                        {% elif sphere.title == "Семья" %}
+                                            Связь с родными, время, проведённое вместе, взаимопонимание.
+                                        {% elif sphere.title == "Личностный рост" %}
+                                            Обучение, новые навыки, саморазвитие, выход из зоны комфорта.
+                                        {% elif sphere.title == "Духовность" %}
+                                            Чувство смысла, медитация, вера, связь с природой или высшим началом.
+                                        {% elif sphere.title == "Отдых и развлечения" %}
+                                            Время на хобби, отдых, удовольствие, восстановление энергии.
+                                        {% else %}
+                                            {{ sphere.description|default:"Оцените эту сферу вашей жизни." }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sphere-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if sphere.id in assessed_today %}
+                                        <span class="assessment-badge assessed">
+                                            <i class="bi bi-check-circle me-1"></i>Оценено сегодня
+                                        </span>
+                                    {% else %}
+                                        <span class="assessment-badge not-assessed">
+                                            <i class="bi bi-clock me-1"></i>Не оценено
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    {% if sphere.id in assessed_today %}
+                                        <a href="{% url 'create_assessment' sphere.id %}" class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil-square me-1"></i>Изменить оценку
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'create_assessment' sphere.id %}" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle me-1"></i>Оценить сейчас
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Если spheres есть, но он пустой -->
+            <div class="empty-spheres">
+                <div class="empty-icon">
+                    <i class="bi bi-pie-chart"></i>
+                </div>
+                <h3 class="mb-3" style="color: var(--primary);">Нет доступных сфер для оценки</h3>
+                <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+                    В системе пока не настроены жизненные сферы.
+                    Обратитесь к администратору или добавьте сферы через панель администратора.
+                </p>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Если spheres не передано в контекст -->
+        <div class="empty-spheres">
+            <div class="empty-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <h3 class="mb-3" style="color: var(--primary);">Данные не загружены</h3>
+            <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+                Не удалось загрузить список сфер жизни.
+                Пожалуйста, проверьте подключение к базе данных или обратитесь к администратору.
+            </p>
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-1"></i>Вернуться на главную
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Статистика внизу -->
+    {% if spheres and spheres|length > 0 %}
+    <div class="row mt-5 pt-4 border-top">
+        <div class="col-md-6">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="bi bi-info-circle-fill" style="font-size: 2rem; color: var(--info);"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1">Зачем оценивать регулярно?</h5>
+                    <p class="mb-0 text-muted small">
+                        Регулярная оценка помогает заметить тренды и вовремя скорректировать дисбалансы.
+                        Даже 5 минут в неделю на оценку всех сфер дают огромную пользу для самопознания.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="bi bi-lightbulb-fill" style="font-size: 2rem; color: #f1c40f;"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1">Как оценивать правильно?</h5>
+                    <p class="mb-0 text-muted small">
+                        Будьте честны с собой. Оценивайте не то, какой должна быть сфера, а то, как она есть сейчас.
+                        Ваша цель — не идеальные 10, а искреннее понимание текущего состояния.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Добавим отладочную информацию (можно удалить позже) -->
+{% if debug %}
+<div class="mt-5 p-3 bg-light border rounded small">
+    <h6>Отладочная информация:</h6>
+    <p>Тип spheres: {{ spheres|default:"Не определено" }}</p>
+    <p>Количество сфер: {{ spheres|length|default:"0" }}</p>
+    {% if spheres %}
+        <p>Первая сфера: {{ spheres.0.title|default:"Без названия" }}</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

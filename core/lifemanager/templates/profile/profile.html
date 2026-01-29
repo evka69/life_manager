@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">👤 Личный кабинет</h1>
+
+    <!-- Профиль -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Мои данные</h5>
+            <p><strong>Имя:</strong> {{ user.name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <a href="{% url 'password_change' %}" class="btn btn-outline-primary">
+                <i class="bi bi-key"></i> Изменить пароль
+            </a>
+        </div>
+    </div>
+
+    <!-- Статистика оценок -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">📊 Статистика оценок жизненных сфер</h5>
+            <div class="row text-center">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ total_assessments }}</div>
+                        <div class="stat-label">Всего оценок</div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ last_week_count }}</div>
+                        <div class="stat-label">За неделю</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ average_score }}</div>
+                        <div class="stat-label">Средняя оценка</div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'assessment_history' %}" class="btn btn-sm btn-outline-secondary">
+                    → История всех оценок
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние цели -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">🎯 Мои последние цели</h5>
+                <a href="{% url 'goal_list' %}" class="btn btn-sm btn-outline-secondary">→ Все цели</a>
+            </div>
+            {% if recent_goals %}
+                <div class="list-group">
+                    {% for goal in recent_goals %}
+                    <a href="{% url 'edit_goal' goal.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ goal.title }}</strong>
+                            <span class="badge bg-{{ goal.status|yesno:'success,warning,secondary' }}">{{ goal.get_status_display }}</span>
+                        </div>
+                        <small class="text-muted">Дедлайн: {{ goal.deadline|date:"d E Y" }} • {{ goal.sphere.title }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Нет целей. <a href="{% url 'create_goal' %}">Создать цель →</a></p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Последние записи дневника -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">📓 Последние записи</h5>
+                <a href="{% url 'diary_list' %}" class="btn btn-sm btn-outline-secondary">→ Весь дневник</a>
+            </div>
+            {% if recent_entries %}
+                <div class="list-group">
+                    {% for entry in recent_entries %}
+                    <a href="{% url 'edit_diary_entry' entry.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ entry.text|truncatewords:15 }}</span>
+                            <small class="text-muted">{{ entry.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                        {% if entry.sphere or entry.goal %}
+                        <small class="text-muted">
+                            {% if entry.sphere %}{{ entry.sphere.title }}{% endif %}
+                            {% if entry.goal %} → {{ entry.goal.title }}{% endif %}
+                        </small>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Нет записей. <a href="{% url 'create_diary_entry' %}">Создать запись →</a></p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">📓 Мои заметки</h5>
+                <a href="{% url 'note_list' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <p class="text-muted mt-2">Организуйте задачи и мысли с помощью чеклистов</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

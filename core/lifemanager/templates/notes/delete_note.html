@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Удалить заметку — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container { max-width: 600px; margin: 0 auto; }
+    .delete-card {
+        background: white; border-radius: 16px; padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+    .warning-icon {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white; display: flex; align-items: center;
+        justify-content: center; font-size: 2.5rem;
+        margin: 0 auto 1.5rem;
+    }
+    .btn-danger-custom {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white; border: none; border-radius: 10px;
+        padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600;
+        width: 100%; max-width: 200px;
+    }
+    .btn-outline-custom {
+        background: white; color: var(--primary); border: 2px solid var(--primary);
+        border-radius: 10px; padding: 1rem 2rem; font-size: 1rem;
+        font-weight: 600; text-decoration: none;
+        display: inline-block; width: 100%; max-width: 200px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container fade-in">
+    <div class="delete-card">
+        <div class="warning-icon">
+            <i class="bi bi-journal-x"></i>
+        </div>
+
+        <h3 class="mb-3" style="color: #e74c3c;">Удалить заметку?</h3>
+
+        <p class="mb-3">
+            Вы уверены, что хотите удалить заметку <strong>«{{ note.title }}»</strong>?
+        </p>
+        <p class="text-muted small">
+            Это действие нельзя отменить.
+        </p>
+
+        <form method="post" style="margin: 2rem 0;">
+            {% csrf_token %}
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="btn-danger-custom">
+                    <i class="bi bi-trash me-2"></i>Да, удалить
+                </button>
+                <a href="{% url 'note_list' %}" class="btn-outline-custom">
+                    <i class="bi bi-x-circle me-2"></i>Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, rgba(56, 178, 172, 0.03) 0%, rgba(56, 178, 172, 0.01) 100%);
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(56, 178, 172, 0.15);
+        width: 100%;
+        max-width: 500px;
+        overflow: hidden;
+        border: 1px solid rgba(56, 178, 172, 0.1);
+        transition: var(--transition);
+    }
+
+    .auth-card:hover {
+        box-shadow: 0 20px 60px rgba(56, 178, 172, 0.2);
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.3;
+    }
+
+    .auth-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .auth-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .auth-body {
+        padding: 2.5rem 2rem;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+        box-sizing: border-box;
+    }
+
+    .form-control-custom:focus {
+        outline: none;
+        border-color: var(--success);
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.1);
+    }
+
+    /* Фиксированное поле пароля */
+    .password-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-container .form-control-custom {
+        flex: 1;
+        padding-right: 45px;
+        /* Место для глазка */
+        height: 42px;
+        /* Фиксированная высота */
+        line-height: 1.5;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #7f8c8d;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease;
+        z-index: 10;
+    }
+
+    .toggle-password:hover {
+        color: var(--success);
+    }
+
+    .auth-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(56, 178, 172, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .auth-link {
+        color: var(--success);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .auth-link:hover {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+
+    .message-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-custom {
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    .alert-error {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        color: #c0392b;
+    }
+
+    .alert-success {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid rgba(46, 204, 113, 0.3);
+        color: #27ae60;
+    }
+
+    .alert-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container fade-in">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <h1 class="auth-title">Начните свой путь</h1>
+            <p class="auth-subtitle">Создайте аккаунт LIFE BALANCE</p>
+        </div>
+
+        <div class="auth-body">
+            <!-- Сообщения -->
+            {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                <div class="alert-custom {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <i
+                        class="bi {% if message.tags == 'error' %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %} alert-icon"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" id="registerForm">
+                {% csrf_token %}
+
+                <!-- Email -->
+                <div class="form-group-custom">
+                    <label for="email" class="form-label">
+                        <i class="bi bi-envelope me-1"></i>Email адрес *
+                    </label>
+                    <input type="email" name="email" id="email"
+                        class="form-control-custom {% if field_errors.email %}is-invalid{% endif %}"
+                        value="{{ email|default:'' }}" required placeholder="ваш@email.com" autocomplete="email">
+                    {% if field_errors.email %}
+                    <div class="text-danger small mt-1">{{ field_errors.email }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Имя -->
+                <div class="form-group-custom">
+                    <label for="name" class="form-label">
+                        <i class="bi bi-person me-1"></i>Ваше имя *
+                    </label>
+                    <input type="text" name="name" id="name"
+                        class="form-control-custom {% if field_errors.name %}is-invalid{% endif %}"
+                        value="{{ name|default:'' }}" required placeholder="Как к вам обращаться?" autocomplete="name">
+                    {% if field_errors.name %}
+                    <div class="text-danger small mt-1">{{ field_errors.name }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Пароль -->
+                <div class="form-group-custom">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-key me-1"></i>Пароль *
+                    </label>
+                    <div class="password-container">
+                        <input type="password" name="password" id="password"
+                            class="form-control-custom {% if field_errors.password %}is-invalid{% endif %}" required
+                            placeholder="Создайте надежный пароль" autocomplete="new-password">
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if field_errors.password %}
+                    <div class="text-danger small mt-1">{{ field_errors.password }}</div>
+                    {% endif %}
+                    <!-- Динамические ошибки -->
+                    <div id="password-errors" class="mt-1"></div>
+                </div>
+
+                <!-- Подтверждение пароля -->
+                <div class="form-group-custom">
+                    <label for="password_confirm" class="form-label">
+                        <i class="bi bi-key-fill me-1"></i>Подтвердите пароль *
+                    </label>
+                    <div class="password-container">
+                        <input type="password" name="password_confirm" id="password_confirm"
+                            class="form-control-custom {% if field_errors.password_confirm %}is-invalid{% endif %}"
+                            required placeholder="Повторите пароль для подтверждения" autocomplete="new-password">
+                        <button type="button" class="toggle-password" id="togglePasswordConfirm">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if field_errors.password_confirm %}
+                    <div class="text-danger small mt-1">{{ field_errors.password_confirm }}</div>
+                    {% endif %}
+                    <!-- Совпадение паролей -->
+                    <div id="password-match" class="mt-1"></div>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    <i class="bi bi-person-plus me-2"></i>Создать аккаунт
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>
+                    Уже есть аккаунт?
+                    <a href="{% url 'login' %}" class="auth-link">Войдите здесь</a>
+                </p>
+                <p class="mt-2 small text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Регистрация займет меньше минуты, после чего вы получите доступ ко всем функциям системы
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('password');
+        const passwordConfirmInput = document.getElementById('password_confirm');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const togglePasswordConfirmBtn = document.getElementById('togglePasswordConfirm');
+
+        // Показ/скрытие пароля
+        function setupPasswordToggle(inputElement, toggleBtn) {
+            toggleBtn.addEventListener('click', function () {
+                const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
+                inputElement.setAttribute('type', type);
+                const eyeIcon = toggleBtn.querySelector('i');
+                eyeIcon.className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+                inputElement.focus();
+            });
+        }
+
+        setupPasswordToggle(passwordInput, togglePasswordBtn);
+        setupPasswordToggle(passwordConfirmInput, togglePasswordConfirmBtn);
+
+        // Динамическая проверка пароля
+        passwordInput.addEventListener('input', function () {
+            const password = this.value;
+            const errors = [];
+
+            if (password.length < 8) {
+                errors.push("Пароль должен содержать минимум 8 символов");
+            }
+            if (!/[A-Z]/.test(password)) {
+                errors.push("Пароль должен содержать хотя бы одну заглавную букву");
+            }
+            if (!/[a-z]/.test(password)) {
+                errors.push("Пароль должен содержать хотя бы одну строчную букву");
+            }
+            if (!/\d/.test(password)) {
+                errors.push("Пароль должен содержать хотя бы одну цифру");
+            }
+            if (!/[.!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                errors.push("Пароль должен содержать хотя бы один спецсимвол (например, ., !, @)");
+            }
+
+            const errorDiv = document.getElementById('password-errors');
+            if (errors.length > 0) {
+                errorDiv.innerHTML = '<div class="text-danger small">' + errors.map(err => `• ${err}`).join('<br>') + '</div>';
+            } else {
+                errorDiv.innerHTML = '<div class="text-success small">✓ Пароль соответствует всем требованиям</div>';
+            }
+        });
+
+        // Проверка совпадения паролей
+        function checkMatch() {
+            const pass = passwordInput.value;
+            const confirm = passwordConfirmInput.value;
+            const matchDiv = document.getElementById('password-match');
+            if (confirm === '') {
+                matchDiv.innerHTML = '';
+            } else if (pass === confirm) {
+                matchDiv.innerHTML = '<div class="text-success small">✓ Пароли совпадают</div>';
+            } else {
+                matchDiv.innerHTML = '<div class="text-danger small">✗ Пароли не совпадают</div>';
+            }
+        }
+
+        passwordConfirmInput.addEventListener('input', checkMatch);
+    });
+</script>
+{% endblock %}

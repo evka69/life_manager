@@ -1,0 +1,527 @@
+{% extends 'base.html' %}
+{% block title %}Создать напоминание — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reminder-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .reminder-header {
+        background: linear-gradient(135deg, rgba(74, 111, 165, 0.1) 0%, rgba(74, 111, 165, 0.05) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--primary);
+    }
+
+    .reminder-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.8rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control-custom:focus {
+        outline: none;
+        border-color: var(--primary);
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+    }
+
+    .select-icon {
+        position: relative;
+    }
+
+    .select-icon select {
+        padding-left: 2.5rem;
+    }
+
+    .select-icon i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+        font-size: 1.1rem;
+        z-index: 10;
+    }
+
+    .reminder-type-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .reminder-type-card:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+
+    .reminder-type-card.selected {
+        background: rgba(74, 111, 165, 0.1);
+        border-left-color: var(--primary);
+    }
+
+    .type-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-right: 1rem;
+    }
+
+    .type-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .type-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .time-picker {
+        position: relative;
+    }
+
+    .time-picker input {
+        padding-left: 2.5rem;
+    }
+
+    .time-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+
+    .goal-select {
+        position: relative;
+    }
+
+    .goal-select select {
+        padding-left: 2.5rem;
+    }
+
+    .goal-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+
+    .info-tip {
+        background: rgba(56, 178, 172, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+        border-left: 3px solid var(--success);
+    }
+
+    .info-tip i {
+        color: var(--success);
+        margin-right: 0.5rem;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3);
+    }
+
+    .btn-outline-custom {
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-outline-custom:hover {
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+    }
+
+    .reminder-preview {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.1) 0%, rgba(241, 196, 15, 0.05) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid #f1c40f;
+        display: none;
+    }
+
+    .preview-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .preview-details {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+        .reminder-container {
+            padding: 0 1rem;
+        }
+
+        .reminder-header {
+            padding: 1.5rem;
+        }
+
+        .reminder-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reminder-container fade-in">
+    <!-- Заголовок -->
+    <div class="reminder-header">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="bi bi-bell-fill" style="font-size: 2.5rem; color: var(--primary);"></i>
+            </div>
+            <div>
+                <h1 class="display-6 fw-bold mb-2" style="color: var(--primary);">Создать напоминание</h1>
+                <p class="lead mb-0 text-muted">
+                    Напоминания помогут вам не забывать о важных действиях и регулярной рефлексии.
+                    Выберите тип напоминания и настройте его параметры.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Форма создания напоминания -->
+    <div class="reminder-card">
+        <form method="post" id="reminderForm">
+            {% csrf_token %}
+
+            <!-- Выбор типа напоминания -->
+            <div class="form-group-custom">
+                <label class="form-label">Тип напоминания</label>
+
+                <div class="mb-3" id="typeSelector">
+                    <div class="reminder-type-card" data-type="daily">
+                        <div class="d-flex align-items-center">
+                            <div class="type-icon">
+                                <i class="bi bi-calendar-day"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="type-title">Ежедневное</div>
+                                <p class="type-description">Напоминание будет приходить каждый день в указанное время</p>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" value="daily" id="typeDaily" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reminder-type-card" data-type="weekly">
+                        <div class="d-flex align-items-center">
+                            <div class="type-icon">
+                                <i class="bi bi-calendar-week"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="type-title">Еженедельное</div>
+                                <p class="type-description">Напоминание будет приходить раз в неделю в указанное время</p>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" value="weekly" id="typeWeekly">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reminder-type-card" data-type="deadline_based">
+                        <div class="d-flex align-items-center">
+                            <div class="type-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="type-title">По дедлайну цели</div>
+                                <p class="type-description">Напоминания о приближении дедлайна выбранной цели</p>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" value="deadline_based" id="typeDeadline">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Выбор времени -->
+            <div class="form-group-custom">
+                <label for="time" class="form-label">Время напоминания</label>
+                <div class="time-picker">
+                    <i class="bi bi-clock time-icon"></i>
+                    <input type="time"
+                           name="time"
+                           id="time"
+                           class="form-control-custom"
+                           required
+                           value="09:00">
+                </div>
+            </div>
+
+            <!-- Выбор цели (опционально) -->
+            <div class="form-group-custom">
+                <label for="goal" class="form-label">Привязать к цели (опционально)</label>
+                <div class="goal-select">
+                    <i class="bi bi-flag goal-icon"></i>
+                    <select name="goal" id="goal" class="form-control-custom">
+                        <option value="">— Не привязывать —</option>
+                        {% for goal in goals %}
+                            <option value="{{ goal.id }}">{{ goal.title }} (до {{ goal.deadline|date:"d.m.Y" }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <small class="text-muted">Напоминание может быть связано с конкретной целью для лучшего контекста</small>
+            </div>
+
+            <!-- Подсказка -->
+            <div class="info-tip">
+                <i class="bi bi-lightbulb"></i>
+                <strong>Совет:</strong> Регулярные напоминания помогают формировать полезные привычки
+                и не забывать о важных действиях. Рекомендуем установить напоминание на удобное для вас время,
+                когда вы обычно можете уделить несколько минут рефлексии.
+            </div>
+
+            <!-- Предпросмотр -->
+            <div class="reminder-preview" id="reminderPreview">
+                <div class="preview-title">
+                    <i class="bi bi-eye me-2"></i>Предпросмотр напоминания
+                </div>
+                <div class="preview-details">
+                    <div id="previewText">Напоминание будет настроено с указанными параметрами</div>
+                </div>
+            </div>
+
+            <!-- Кнопки -->
+            <button type="submit" class="btn-primary-custom">
+                <i class="bi bi-check-circle me-2"></i>Создать напоминание
+            </button>
+
+            <a href="{% url 'dashboard' %}" class="btn-outline-custom">
+                <i class="bi bi-x-circle me-2"></i>Отмена
+            </a>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Элементы формы
+    const typeCards = document.querySelectorAll('.reminder-type-card');
+    const typeInputs = document.querySelectorAll('input[name="type"]');
+    const timeInput = document.getElementById('time');
+    const goalSelect = document.getElementById('goal');
+    const reminderPreview = document.getElementById('reminderPreview');
+    const previewText = document.getElementById('previewText');
+
+    // Обработчик выбора типа напоминания
+    typeCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const type = this.dataset.type;
+
+            // Снимаем выделение со всех карточек
+            typeCards.forEach(c => c.classList.remove('selected'));
+
+            // Выделяем выбранную карточку
+            this.classList.add('selected');
+
+            // Активируем соответствующий radio button
+            document.getElementById(`type${type.charAt(0).toUpperCase() + type.slice(1).replace('_based', '')}`).checked = true;
+
+            // Обновляем предпросмотр
+            updatePreview();
+        });
+    });
+
+    // Обработчики для radio buttons
+    typeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Снимаем выделение со всех карточек
+            typeCards.forEach(c => c.classList.remove('selected'));
+
+            // Выделяем соответствующую карточку
+            const type = this.value;
+            const card = document.querySelector(`[data-type="${type}"]`);
+            if (card) {
+                card.classList.add('selected');
+            }
+
+            // Обновляем предпросмотр
+            updatePreview();
+        });
+    });
+
+    // Обработчики изменений для предпросмотра
+    timeInput.addEventListener('change', updatePreview);
+    goalSelect.addEventListener('change', updatePreview);
+
+    // Функция обновления предпросмотра
+    function updatePreview() {
+        const type = document.querySelector('input[name="type"]:checked')?.value;
+        const time = timeInput.value;
+        const goalId = goalSelect.value;
+        const goalText = goalSelect.options[goalSelect.selectedIndex]?.text || '';
+
+        if (!type || !time) {
+            reminderPreview.style.display = 'none';
+            return;
+        }
+
+        let preview = '';
+
+        // Определяем тип напоминания
+        let typeText = '';
+        switch(type) {
+            case 'daily':
+                typeText = 'Ежедневное напоминание';
+                break;
+            case 'weekly':
+                typeText = 'Еженедельное напоминание';
+                break;
+            case 'deadline_based':
+                typeText = 'Напоминание по дедлайну цели';
+                break;
+        }
+
+        preview += `<strong>${typeText}</strong><br>`;
+        preview += `⏰ Время: ${time}<br>`;
+
+        if (goalId) {
+            preview += `🎯 Цель: ${goalText.split(' (до')[0]}<br>`;
+        } else {
+            preview += `📝 Общее напоминание о рефлексии<br>`;
+        }
+
+        // Добавляем рекомендацию
+        preview += `<small class="text-muted mt-2"><i class="bi bi-info-circle"></i> Вы получите уведомление в указанное время</small>`;
+
+        previewText.innerHTML = preview;
+        reminderPreview.style.display = 'block';
+    }
+
+    // Инициализация предпросмотра
+    updatePreview();
+
+    // Анимация появления карточек
+    typeCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100 + 200);
+    });
+
+    // Валидация формы
+    const reminderForm = document.getElementById('reminderForm');
+    reminderForm.addEventListener('submit', function(e) {
+        const type = document.querySelector('input[name="type"]:checked');
+        const time = timeInput.value;
+
+        if (!type || !time) {
+            e.preventDefault();
+
+            // Показываем сообщение об ошибке
+            if (!document.querySelector('.alert-error')) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert-custom alert-error';
+                errorDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle alert-icon"></i>
+                    Пожалуйста, выберите тип напоминания и время
+                `;
+                errorDiv.style.marginBottom = '1.5rem';
+                errorDiv.style.padding = '1rem';
+                errorDiv.style.borderRadius = '10px';
+                errorDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+                errorDiv.style.border = '1px solid rgba(231, 76, 60, 0.3)';
+                errorDiv.style.color = '#c0392b';
+
+                reminderForm.prepend(errorDiv);
+
+                // Прокручиваем к ошибке
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+
+    // Автовыбор первого типа
+    if (typeCards.length > 0) {
+        typeCards[0].click();
+    }
+});
+</script>
+{% endblock %}

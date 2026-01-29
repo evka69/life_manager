@@ -1,0 +1,605 @@
+{% extends 'base.html' %}
+{% block title %}Мой дневник — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .diary-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .diary-header {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(155, 89, 182, 0.05) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid #9b59b6;
+    }
+
+    .diary-stats {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        min-width: 120px;
+    }
+
+    .stat-value {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
+        color: #9b59b6;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .entry-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border-left: 5px solid #9b59b6;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .entry-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .entry-card.with-media {
+        border-left-color: #3498db;
+    }
+
+    .entry-card.with-goal {
+        border-left-color: var(--success);
+    }
+
+    .entry-date {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(155, 89, 182, 0.1);
+        color: #9b59b6;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .entry-date-number {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-right: 0.3rem;
+    }
+
+    .entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        padding-right: 100px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .meta-icon {
+        color: #9b59b6;
+        font-size: 1rem;
+    }
+
+    .entry-text {
+        color: #5d6d7e;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        padding-right: 80px;
+    }
+
+    .entry-text p {
+        margin-bottom: 1rem;
+    }
+
+    .entry-text p:last-child {
+        margin-bottom: 0;
+    }
+
+    .media-container {
+        margin: 1.5rem 0;
+        border-radius: 10px;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .media-container img {
+        width: 100%;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .media-container img:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .media-container video,
+    .media-container audio {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .entry-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn-create-entry {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-create-entry:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(155, 89, 182, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+        margin-top: 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #bdc3c7;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+
+    .empty-text {
+        color: #7f8c8d;
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+    }
+
+    .journaling-tips {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(46, 204, 113, 0.02) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid var(--success);
+    }
+
+    .tip-item {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .tip-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .tip-icon {
+        color: var(--success);
+        font-size: 1rem;
+        margin-top: 0.2rem;
+        flex-shrink: 0;
+    }
+
+    .tip-text {
+        font-size: 0.95rem;
+        color: #5d6d7e;
+        line-height: 1.5;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        gap: 0.5rem;
+    }
+
+    .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: white;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(74, 111, 165, 0.1);
+    }
+
+    .page-link:hover {
+        background: rgba(74, 111, 165, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .page-link.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .page-link.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-link.disabled:hover {
+        background: white;
+        transform: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="diary-container fade-in">
+    <!-- Заголовок и кнопка -->
+    <div class="diary-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6 fw-bold mb-2" style="color: #9b59b6;">
+                    <i class="bi bi-journal-text me-2"></i>Мой дневник
+                </h1>
+                <p class="lead mb-0 text-muted">
+                    Дневник — ваше пространство для рефлексии, благодарности, мыслей и отслеживания прогресса.
+                    Каждая запись помогает лучше понять себя и свой путь.
+                </p>
+            </div>
+            <a href="{% url 'create_diary_entry' %}" class="btn-create-entry">
+                <i class="bi bi-plus-circle me-1"></i> Новая запись
+            </a>
+        </div>
+    </div>
+
+    <!-- Статистика дневника -->
+    <div class="diary-stats">
+        <div class="stat-item">
+            <div class="stat-value">{{ entries|length }}</div>
+            <div class="stat-label">Всего записей</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ with_media_count|default:0 }}</div>
+            <div class="stat-label">С медиа</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ with_goal_count|default:0 }}</div>
+            <div class="stat-label">С целями</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ last_30_days|default:0 }}</div>
+            <div class="stat-label">За 30 дней</div>
+        </div>
+    </div>
+
+    <!-- Список записей -->
+    {% if entries %}
+        <div class="diary-list">
+            {% for entry in entries %}
+            <div class="entry-card {% if entry.media_file %}with-media{% elif entry.goal %}with-goal{% endif %}">
+                <!-- Дата записи -->
+                <div class="entry-date">
+                    <span class="entry-date-number">{{ entry.created_at|date:"d" }}</span>
+                    {{ entry.created_at|date:"M"|lower }}
+                </div>
+
+                <!-- Мета-информация -->
+                <div class="entry-meta">
+                    <div class="meta-item">
+                        <i class="bi bi-clock meta-icon"></i>
+                        <span>{{ entry.created_at|time:"H:i" }}</span>
+                    </div>
+                    {% if entry.sphere %}
+                    <div class="meta-item">
+                        <i class="bi bi-pie-chart meta-icon"></i>
+                        <span>{{ entry.sphere.title }}</span>
+                    </div>
+                    {% endif %}
+                    {% if entry.goal %}
+                    <div class="meta-item">
+                        <i class="bi bi-flag meta-icon"></i>
+                        <span>{{ entry.goal.title }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Текст записи -->
+                <div class="entry-text">
+                    {{ entry.text|linebreaks }}
+                </div>
+
+                <!-- Медиафайл -->
+                {% if entry.media_file %}
+                <div class="media-container">
+                    {% if entry.media_file.url|slice:"-4:"|lower in ".jpg.png.gif.jpeg" %}
+                        <img src="{{ entry.media_file.url }}"
+                             alt="Медиа из дневника"
+                             onclick="openModal('{{ entry.media_file.url }}', 'image')">
+                    {% elif entry.media_file.url|slice:"-4:"|lower == ".mp4" or entry.media_file.url|slice:"-5:"|lower == ".webm" %}
+                        <video controls>
+                            <source src="{{ entry.media_file.url }}" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                    {% elif entry.media_file.url|slice:"-4:"|lower in ".mp3.ogg.wav" %}
+                        <audio controls>
+                            <source src="{{ entry.media_file.url }}" type="audio/mpeg">
+                            Ваш браузер не поддерживает аудио.
+                        </audio>
+                    {% else %}
+                        <a href="{{ entry.media_file.url }}"
+                           target="_blank"
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-download me-1"></i>Скачать файл
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Действия -->
+                <div class="entry-actions">
+                    <a href="{% url 'edit_diary_entry' entry.id %}" class="btn-edit">
+                        <i class="bi bi-pencil-square"></i> Редактировать
+                    </a>
+                    <a href="{% url 'delete_diary_entry' entry.id %}" class="btn-delete">
+                        <i class="bi bi-trash"></i> Удалить
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="page-link">&laquo;</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">&lsaquo;</a>
+            {% else %}
+                <span class="page-link disabled">&laquo;</span>
+                <span class="page-link disabled">&lsaquo;</span>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="page-link active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="page-link">&rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">&raquo;</a>
+            {% else %}
+                <span class="page-link disabled">&rsaquo;</span>
+                <span class="page-link disabled">&raquo;</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <!-- Состояние без записей -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-journal"></i>
+            </div>
+            <h3 class="empty-title">Ваш дневник пока пуст</h3>
+            <p class="empty-text">
+                ✍️ Начните с простого: «Сегодня я чувствую...» или «Я горжусь тем, что...»
+                Даже несколько слов в день создают ценный архив вашего внутреннего мира и роста.
+            </p>
+            <a href="{% url 'create_diary_entry' %}" class="btn-create-entry">
+                <i class="bi bi-plus-circle me-2"></i>Создать первую запись
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Советы по ведению дневника -->
+    <div class="journaling-tips">
+        <h5 class="mb-3" style="color: var(--success);">
+            <i class="bi bi-lightbulb me-2"></i>Почему вести дневник полезно:
+        </h5>
+
+        <div class="tip-item">
+            <i class="bi bi-heart tip-icon"></i>
+            <div class="tip-text">
+                <strong>Эмоциональная разгрузка:</strong> Выплеснуть эмоции на бумагу — эффективный способ справиться со стрессом.
+            </div>
+        </div>
+
+        <div class="tip-item">
+            <i class="bi bi-eye tip-icon"></i>
+            <div class="tip-text">
+                <strong>Самопознание:</strong> Регулярные записи помогают лучше понять свои мысли, чувства и мотивы.
+            </div>
+        </div>
+
+        <div class="tip-item">
+            <i class="bi bi-graph-up tip-icon"></i>
+            <div class="tip-text">
+                <strong>Отслеживание прогресса:</strong> Видеть, как вы растёте и меняетесь со временем, мотивирует продолжать путь.
+            </div>
+        </div>
+
+        <div class="tip-item">
+            <i class="bi bi-lightbulb tip-icon"></i>
+            <div class="tip-text">
+                <strong>Генерация идей:</strong> В процессе письма часто приходят неожиданные инсайты и решения проблем.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для изображений -->
+<div id="imageModal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center;">
+    <div style="position: relative; max-width: 90%; max-height: 90%;">
+        <img id="modalImage" src="" alt="" style="max-width: 100%; max-height: 80vh; border-radius: 8px;">
+        <button onclick="closeModal()" style="position: absolute; top: -40px; right: -40px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">
+            <i class="bi bi-x-circle"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+// Модальное окно для изображений
+function openModal(src, type) {
+    if (type === 'image') {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.style.display = 'flex';
+        modalImg.src = src;
+
+        // Блокируем прокрутку страницы
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+
+    // Восстанавливаем прокрутку страницы
+    document.body.style.overflow = 'auto';
+}
+
+// Закрытие модального окна при клике вне изображения
+document.getElementById('imageModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Анимация появления записей
+document.addEventListener('DOMContentLoaded', function() {
+    const entryCards = document.querySelectorAll('.entry-card');
+    entryCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100 + 200);
+    });
+
+    // Подсветка при наведении на медиа
+    const mediaImages = document.querySelectorAll('.media-container img');
+    mediaImages.forEach(img => {
+        img.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+    });
+
+    // Обработка клавиши Escape для закрытия модального окна
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+});
+</script>
+{% endblock %}

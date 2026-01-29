@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% block title %}Удалить запись — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .delete-header {
+        background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid #e74c3c;
+    }
+
+    .delete-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .warning-card {
+        background: linear-gradient(135deg, rgba(231, 76, 60, 0.05) 0%, rgba(231, 76, 60, 0.02) 100%);
+        border: 2px solid rgba(231, 76, 60, 0.2);
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+
+    .warning-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 1.5rem;
+    }
+
+    .entry-preview {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid #9b59b6;
+        text-align: left;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .entry-text {
+        color: #5d6d7e;
+        line-height: 1.6;
+        font-style: italic;
+        margin: 0;
+        padding: 0.5rem 0;
+    }
+
+    .entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .meta-icon {
+        color: #9b59b6;
+        font-size: 1rem;
+    }
+
+    .btn-danger-custom {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        max-width: 200px;
+        margin: 0.5rem;
+    }
+
+    .btn-danger-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-outline-custom {
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        max-width: 200px;
+        margin: 0.5rem;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-outline-custom:hover {
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+    }
+
+    .consider-card {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid #3498db;
+    }
+
+    .consider-icon {
+        color: #3498db;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+
+    .quote-card {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.05) 0%, rgba(155, 89, 182, 0.02) 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        border-left: 3px solid #9b59b6;
+        font-style: italic;
+        color: #5d6d7e;
+        text-align: center;
+    }
+
+    .quote-icon {
+        color: #9b59b6;
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container fade-in">
+    <!-- Заголовок -->
+    <div class="delete-header">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c;"></i>
+            </div>
+            <div>
+                <h1 class="display-6 fw-bold mb-2" style="color: #e74c3c;">🗑️ Удалить запись?</h1>
+                <p class="lead mb-0 text-muted">
+                    Это действие нельзя отменить. Пожалуйста, убедитесь, что вы хотите удалить эту запись из вашего дневника.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основная информация -->
+    <div class="delete-card">
+        <div class="warning-card">
+            <div class="warning-icon">
+                <i class="bi bi-journal-x"></i>
+            </div>
+
+            <h3 class="mb-3" style="color: #e74c3c;">Вы уверены, что хотите удалить эту запись?</h3>
+
+            <!-- Предпросмотр записи -->
+            <div class="entry-preview">
+                <p class="entry-text">«{{ entry.text|truncatewords:50 }}»</p>
+
+                <div class="entry-meta">
+                    <div class="meta-item">
+                        <i class="bi bi-calendar meta-icon"></i>
+                        <span><strong>Создано:</strong> {{ entry.created_at|date:"d E Y" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="bi bi-clock meta-icon"></i>
+                        <span><strong>Время:</strong> {{ entry.created_at|time:"H:i" }}</span>
+                    </div>
+                    {% if entry.sphere %}
+                    <div class="meta-item">
+                        <i class="bi bi-pie-chart meta-icon"></i>
+                        <span><strong>Сфера:</strong> {{ entry.sphere.title }}</span>
+                    </div>
+                    {% endif %}
+                    {% if entry.goal %}
+                    <div class="meta-item">
+                        <i class="bi bi-flag meta-icon"></i>
+                        <span><strong>Цель:</strong> {{ entry.goal.title }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p style="color: #555; line-height: 1.6; margin: 1.5rem 0;">
+                Эта запись будет удалена без возможности восстановления.
+                Подумайте: возможно, её стоит оставить как часть вашего пути роста и самопознания?
+            </p>
+
+            <!-- Вдохновляющая цитата -->
+            <div class="quote-card">
+                <i class="bi bi-chat-quote quote-icon"></i>
+                «Даже «неудачные» записи важны — они показывают, как вы росли и менялись со временем».
+            </div>
+        </div>
+
+        <!-- Форма удаления -->
+        <form method="post" style="margin: 2rem 0;">
+            {% csrf_token %}
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="btn-danger-custom">
+                    <i class="bi bi-trash me-2"></i>Да, удалить
+                </button>
+                <a href="{% url 'diary_list' %}" class="btn-outline-custom">
+                    <i class="bi bi-x-circle me-2"></i>Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Альтернатива удалению -->
+    <div class="consider-card">
+        <div class="d-flex align-items-start">
+            <div class="consider-icon">
+                <i class="bi bi-lightbulb"></i>
+            </div>
+            <div>
+                <h5 class="mb-2" style="color: #3498db;">Рассмотрите альтернативы</h5>
+                <p class="mb-0">
+                    <strong>Вместо удаления можно:</strong><br>
+                    1. <strong>Отредактировать запись</strong> — уточнить мысли или добавить новые инсайты.<br>
+                    2. <strong>Оставить как есть</strong> — каждая запись отражает момент вашего пути.<br>
+                    3. <strong>Добавить пометку</strong> — отметить, как ваше понимание изменилось с тех пор.<br>
+                    4. <strong>Создать новую запись</strong> — с текущими мыслями и рефлексией на старую запись.
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- Модальное окно подтверждения удаления -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Подтвердите действие</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить запись <strong>«{{ entry.text|truncatewords:10 }}...»</strong>?</p>
+                <p class="text-muted small">Это действие нельзя отменить.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class "btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="bi bi-trash me-1"></i>Удалить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Обработка кастомного подтверждения
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    document.querySelector('form[method="post"]').submit();
+});
+</script>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Анимация появления
+    const elements = document.querySelectorAll('.warning-card, .entry-preview, form');
+    elements.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, index * 100 + 200);
+    });
+
+    // Подсветка предпросмотра записи
+    const entryPreview = document.querySelector('.entry-preview');
+    if (entryPreview) {
+        entryPreview.style.transition = 'all 0.3s ease';
+        entryPreview.addEventListener('mouseenter', function() {
+            this.style.boxShadow = '0 5px 15px rgba(155, 89, 182, 0.1)';
+            this.style.transform = 'translateY(-2px)';
+        });
+        entryPreview.addEventListener('mouseleave', function() {
+            this.style.boxShadow = 'none';
+            this.style.transform = 'translateY(0)';
+        });
+    }
+});
+</script>
+{% endblock %}

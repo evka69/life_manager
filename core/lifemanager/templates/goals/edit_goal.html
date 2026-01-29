@@ -1,0 +1,553 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать цель: {{ goal.title }} — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .goal-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .goal-header {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid #3498db;
+    }
+
+    .goal-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.8rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control-custom:focus {
+        outline: none;
+        border-color: #3498db;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .steps-section {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.05) 0%, rgba(241, 196, 15, 0.02) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-left: 4px solid #f1c40f;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .step-checkbox {
+        flex-shrink: 0;
+    }
+
+    .step-input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+
+    .step-remove {
+        color: #e74c3c;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .step-remove:hover {
+        background-color: rgba(231, 76, 60, 0.1);
+    }
+
+    .btn-add-step {
+        background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-add-step:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3);
+    }
+
+    .current-progress {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(46, 204, 113, 0.05) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(46, 204, 113, 0.2);
+    }
+
+    .progress-circle {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        margin: 0 auto 1rem;
+    }
+
+    .progress-svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+
+    .progress-bg {
+        fill: none;
+        stroke: #ecf0f1;
+        stroke-width: 8;
+    }
+
+    .progress-fill {
+        fill: none;
+        stroke: var(--success);
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        transition: stroke-dashoffset 1s ease;
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--success);
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-outline-custom {
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-outline-custom:hover {
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+    }
+
+    .message-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-custom {
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    .alert-error {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        color: #c0392b;
+    }
+
+    .alert-success {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid rgba(46, 204, 113, 0.3);
+        color: #27ae60;
+    }
+
+    .alert-warning {
+        background-color: rgba(241, 196, 15, 0.1);
+        border: 1px solid rgba(241, 196, 15, 0.3);
+        color: #f39c12;
+    }
+
+    .alert-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="goal-container fade-in">
+    <!-- Заголовок -->
+    <div class="goal-header">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="bi bi-pencil-square" style="font-size: 2.5rem; color: #3498db;"></i>
+            </div>
+            <div>
+                <h1 class="display-6 fw-bold mb-2" style="color: #3498db;">✏️ Редактировать цель</h1>
+                <p class="lead mb-0 text-muted">
+                    Обновите детали цели, чтобы она оставалась актуальной и достижимой.
+                    Не бойтесь корректировать дедлайны или статус — гибкость важна на пути к результату.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Карточка с текущим прогрессом -->
+    <div class="current-progress text-center">
+        <div class="progress-circle">
+            <svg class="progress-svg" viewBox="0 0 100 100">
+                <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
+                <circle class="progress-fill" cx="50" cy="50" r="45"></circle>
+            </svg>
+            <div class="progress-text">{{ goal.progress }}%</div>
+        </div>
+        <h4 class="mb-2" style="color: #2c3e50;">{{ goal.title }}</h4>
+        <p class="text-muted mb-0">
+            Сфера: <strong>{{ goal.sphere.title }}</strong> •
+            Дедлайн: <strong>{{ goal.deadline|date:"d E Y" }}</strong>
+        </p>
+    </div>
+
+    <!-- Форма редактирования цели -->
+    <div class="goal-card">
+        <form method="post" id="goalForm">
+            {% csrf_token %}
+
+            <!-- Сообщения -->
+            {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                <div class="alert-custom
+                    {% if message.tags == 'error' %}alert-error
+                    {% elif message.tags == 'warning' %}alert-warning
+                    {% else %}alert-success{% endif %}">
+                    <i class="bi
+                        {% if message.tags == 'error' %}bi-exclamation-triangle
+                        {% elif message.tags == 'warning' %}bi-exclamation-circle
+                        {% else %}bi-check-circle{% endif %} alert-icon"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Основные поля -->
+            <div class="form-group-custom">
+                <label for="title" class="form-label">
+                    <i class="bi bi-bullseye me-1"></i>Название цели *
+                </label>
+                <input type="text"
+                       name="title"
+                       id="title"
+                       value="{{ goal.title }}"
+                       required
+                       maxlength="100"
+                       class="form-control-custom">
+            </div>
+
+            <div class="form-group-custom">
+                <label for="description" class="form-label">
+                    <i class="bi bi-text-paragraph me-1"></i>Описание
+                </label>
+                <textarea name="description"
+                          id="description"
+                          rows="4"
+                          class="form-control-custom">{{ goal.description }}</textarea>
+                <small class="text-muted">Что именно вы сделаете? Как поймёте, что достигли?</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label for="sphere" class="form-label">
+                            <i class="bi bi-pie-chart me-1"></i>Жизненная сфера *
+                        </label>
+                        <select name="sphere"
+                                id="sphere"
+                                required
+                                class="form-control-custom">
+                            {% for sphere in spheres %}
+                                <option value="{{ sphere.id }}" {% if sphere.id == goal.sphere_id %}selected{% endif %}>
+                                    {{ sphere.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label for="deadline" class="form-label">
+                            <i class="bi bi-calendar-check me-1"></i>Дедлайн *
+                        </label>
+                        <input type="date"
+                               name="deadline"
+                               id="deadline"
+                               value="{{ goal.deadline|date:'Y-m-d' }}"
+                               required
+                               min="{{ today }}"
+                               class="form-control-custom">
+                        <small class="text-muted">Когда вы хотите завершить эту цель?</small>
+                    </div>
+                </div>
+            </div>
+
+            {% if not steps %}
+            <div class="form-group-custom">
+                <label for="progress" class="form-label">
+                    <i class="bi bi-graph-up me-1"></i>Прогресс (%)
+                </label>
+                <input type="number"
+                       name="progress"
+                       id="progress"
+                       value="{{ goal.progress }}"
+                       min="0"
+                       max="100"
+                       class="form-control-custom">
+                <small class="text-muted">От 0 до 100. Обновите, если цель не разбита на шаги.</small>
+            </div>
+            {% endif %}
+
+            <div class="form-group-custom">
+                <label for="status" class="form-label">
+                    <i class="bi bi-flag me-1"></i>Статус
+                </label>
+                <select name="status"
+                        id="status"
+                        class="form-control-custom">
+                    <option value="active" {% if goal.status == 'active' %}selected{% endif %}>Активна</option>
+                    <option value="completed" {% if goal.status == 'completed' %}selected{% endif %}>Выполнена</option>
+                    <option value="postponed" {% if goal.status == 'postponed' %}selected{% endif %}>Отложена</option>
+                </select>
+            </div>
+
+            <!-- Шаги к цели -->
+            <div class="steps-section">
+                <h4 class="mb-3" style="color: #f39c12;">
+                    <i class="bi bi-list-check me-2"></i>Шаги к цели
+                </h4>
+                <p class="text-muted mb-3">
+                    {% if goal.steps.all %}
+                        Прогресс рассчитывается автоматически на основе выполненных шагов.
+                    {% else %}
+                        Добавьте шаги, чтобы прогресс обновлялся автоматически.
+                    {% endif %}
+                </p>
+
+                <div id="steps-container">
+                    {% for step in steps %}
+                    <div class="step-item">
+                        <input type="hidden" name="step_id" value="{{ step.id }}">
+                        <div class="step-checkbox">
+                            <input type="checkbox"
+                                   name="step_completed"
+                                   class="form-check-input"
+                                   {% if step.is_completed %}checked{% endif %}>
+                        </div>
+                        <input type="text"
+                               name="step_title"
+                               class="step-input"
+                               value="{{ step.title }}"
+                               required>
+                        <button type="button" class="step-remove" onclick="removeStep(this)">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="addStepField()" class="btn-add-step">
+                    <i class="bi bi-plus-circle"></i> Добавить шаг
+                </button>
+            </div>
+
+            <!-- Кнопки действий -->
+            <button type="submit" class="btn-primary-custom">
+                <i class="bi bi-check-circle me-2"></i>Сохранить изменения
+            </button>
+
+            <a href="{% url 'goal_list' %}" class="btn-outline-custom">
+                <i class="bi bi-x-circle me-2"></i>Отмена
+            </a>
+        </form>
+    </div>
+
+    <!-- Карточка с советами -->
+    <div class="current-progress" style="border-color: var(--primary);">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="bi bi-lightbulb-fill" style="font-size: 1.5rem; color: var(--primary);"></i>
+            </div>
+            <div>
+                <h5 class="mb-2">Совет по корректировке целей</h5>
+                <p class="mb-0">
+                    Если цель кажется слишком большой — разбейте её на подцели.
+                    Даже маленький шаг вперёд — это движение.
+                    Регулярный пересмотр целей помогает оставаться гибким и адаптивным к изменениям в жизни.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Инициализация шагов
+let stepIndex = {{ steps|length }};
+
+function addStepField() {
+    const container = document.getElementById('steps-container');
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'step-item';
+    stepDiv.innerHTML = `
+        <div class="step-checkbox">
+            <input type="checkbox" name="step_completed" class="form-check-input">
+        </div>
+        <input type="text"
+               name="step_title"
+               class="step-input"
+               placeholder="Новый шаг"
+               required>
+        <button type="button" class="step-remove" onclick="removeStep(this)">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+    container.appendChild(stepDiv);
+    stepIndex++;
+
+    // Анимация появления
+    stepDiv.style.opacity = '0';
+    stepDiv.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+        stepDiv.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        stepDiv.style.opacity = '1';
+        stepDiv.style.transform = 'translateY(0)';
+    }, 10);
+}
+
+function removeStep(button) {
+    const stepItem = button.closest('.step-item');
+    stepItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    stepItem.style.opacity = '0';
+    stepItem.style.transform = 'translateY(-10px)';
+    setTimeout(() => {
+        stepItem.remove();
+    }, 300);
+}
+
+// Анимация прогресс-круга
+document.addEventListener('DOMContentLoaded', function() {
+    const progressFill = document.querySelector('.progress-fill');
+    if (progressFill) {
+        const progress = {{ goal.progress }};
+        // Исправляем вычисление без фильтра mul
+        const offset = 283 - (283 * progress / 100);
+        progressFill.style.strokeDashoffset = offset;
+    }
+
+    // Устанавливаем минимальную дату (сегодня)
+    const today = new Date().toISOString().split('T')[0];
+    const deadlineInput = document.getElementById('deadline');
+    if (deadlineInput) {
+        deadlineInput.min = today;
+    }
+
+    // Анимация появления формы
+    const formGroups = document.querySelectorAll('.form-group-custom');
+    formGroups.forEach((group, index) => {
+        group.style.opacity = '0';
+        group.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            group.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            group.style.opacity = '1';
+            group.style.transform = 'translateY(0)';
+        }, index * 50 + 200);
+    });
+});
+</script>
+{% endblock %}

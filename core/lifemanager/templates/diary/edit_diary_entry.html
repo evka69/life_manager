@@ -1,0 +1,672 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать запись — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .diary-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .diary-header {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid #3498db;
+    }
+
+    .diary-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+
+    .entry-info {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.05) 0%, rgba(155, 89, 182, 0.02) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid #9b59b6;
+    }
+
+    .entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .meta-icon {
+        color: #9b59b6;
+        font-size: 1rem;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.8rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control-custom:focus {
+        outline: none;
+        border-color: #3498db;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .textarea-custom {
+        min-height: 200px;
+        resize: vertical;
+        line-height: 1.6;
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    .select-icon {
+        position: relative;
+    }
+
+    .select-icon select {
+        padding-left: 2.5rem;
+    }
+
+    .select-icon i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #3498db;
+        font-size: 1.1rem;
+        z-index: 10;
+    }
+
+    .file-upload {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .file-label {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 10px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .file-label:hover {
+        background: #e9ecef;
+        border-color: #3498db;
+    }
+
+    .file-icon {
+        color: #3498db;
+        font-size: 2rem;
+    }
+
+    .file-info {
+        text-align: left;
+        flex: 1;
+    }
+
+    .file-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .file-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .media-preview {
+        margin-top: 1rem;
+        border-radius: 10px;
+        overflow: hidden;
+        display: none;
+    }
+
+    .media-preview img,
+    .media-preview video,
+    .media-preview audio {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .current-media {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(46, 204, 113, 0.02) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border-left: 4px solid var(--success);
+    }
+
+    .current-media-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-outline-custom {
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-outline-custom:hover {
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+    }
+
+    .message-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-custom {
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    .alert-error {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        color: #c0392b;
+    }
+
+    .alert-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .reflection-tips {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.05) 0%, rgba(241, 196, 15, 0.02) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid #f1c40f;
+    }
+
+    .tip-item {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .tip-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .tip-icon {
+        color: #f1c40f;
+        font-size: 1rem;
+        margin-top: 0.2rem;
+        flex-shrink: 0;
+    }
+
+    .tip-text {
+        font-size: 0.95rem;
+        color: #5d6d7e;
+        line-height: 1.5;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="diary-container fade-in">
+    <!-- Заголовок -->
+    <div class="diary-header">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="bi bi-journal-text" style="font-size: 2.5rem; color: #3498db;"></i>
+            </div>
+            <div>
+                <h1 class="display-6 fw-bold mb-2" style="color: #3498db;">✏️ Редактировать запись</h1>
+                <p class="lead mb-0 text-muted">
+                    Обновите свою запись — возможно, вы хотите уточнить мысли или добавить новые детали.
+                    Помните: дневник — это пространство для честности, а не совершенства.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Информация о записи -->
+    <div class="entry-info">
+        <div class="entry-meta">
+            <div class="meta-item">
+                <i class="bi bi-calendar meta-icon"></i>
+                <span>Создано: <strong>{{ entry.created_at|date:"d E Y" }}</strong></span>
+            </div>
+            <div class="meta-item">
+                <i class="bi bi-clock meta-icon"></i>
+                <span>Время: <strong>{{ entry.created_at|time:"H:i" }}</strong></span>
+            </div>
+            {% if entry.sphere %}
+            <div class="meta-item">
+                <i class="bi bi-pie-chart meta-icon"></i>
+                <span>Сфера: <strong>{{ entry.sphere.title }}</strong></span>
+            </div>
+            {% endif %}
+            {% if entry.goal %}
+            <div class="meta-item">
+                <i class="bi bi-flag meta-icon"></i>
+                <span>Цель: <strong>{{ entry.goal.title }}</strong></span>
+            </div>
+            {% endif %}
+        </div>
+        <p class="mb-0 text-muted small">
+            <i class="bi bi-info-circle me-1"></i>
+            Вы редактируете запись, сделанную {{ entry.created_at|timesince }} назад.
+        </p>
+    </div>
+
+    <!-- Форма редактирования записи -->
+    <div class="diary-card">
+        <form method="post" enctype="multipart/form-data" id="diaryForm">
+            {% csrf_token %}
+
+            <!-- Сообщения -->
+            {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                <div class="alert-custom alert-error">
+                    <i class="bi bi-exclamation-triangle alert-icon"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Текст записи -->
+            <div class="form-group-custom">
+                <label for="text" class="form-label">
+                    <i class="bi bi-chat-text me-1"></i>Текст записи *
+                </label>
+                <textarea name="text"
+                          id="text"
+                          rows="6"
+                          required
+                          class="form-control-custom textarea-custom">{{ entry.text }}</textarea>
+                <small class="text-muted">Пишите от сердца — это только для вас</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label for="sphere" class="form-label">
+                            <i class="bi bi-pie-chart me-1"></i>Жизненная сфера (опционально)
+                        </label>
+                        <div class="select-icon">
+                            <i class="bi bi-pie-chart"></i>
+                            <select name="sphere"
+                                    id="sphere"
+                                    class="form-control-custom">
+                                <option value="">— Не привязывать —</option>
+                                {% for sphere in spheres %}
+                                    <option value="{{ sphere.id }}" {% if sphere.id == entry.sphere_id %}selected{% endif %}>
+                                        {{ sphere.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label for="goal" class="form-label">
+                            <i class="bi bi-flag me-1"></i>Цель (опционально)
+                        </label>
+                        <div class="select-icon">
+                            <i class="bi bi-flag"></i>
+                            <select name="goal"
+                                    id="goal"
+                                    class="form-control-custom">
+                                <option value="">— Не привязывать —</option>
+                                {% for goal in goals %}
+                                    <option value="{{ goal.id }}" {% if goal.id == entry.goal_id %}selected{% endif %}>
+                                        {{ goal.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <small class="text-muted">Только активные и отложенные цели</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Загрузка медиафайла -->
+            <div class="form-group-custom">
+                <label class="form-label">
+                    <i class="bi bi-camera me-1"></i>Медиафайл (опционально)
+                </label>
+
+                <div class="file-upload">
+                    <input type="file"
+                           name="media_file"
+                           id="media_file"
+                           accept="image/*,video/*,audio/*"
+                           class="file-input"
+                           onchange="previewFile(this)">
+                    <label for="media_file" class="file-label">
+                        <div class="file-icon">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-title">Загрузить новый файл</div>
+                            <p class="file-description">
+                                Нажмите для выбора файла или перетащите его сюда<br>
+                                Оставьте пустым, чтобы сохранить текущий файл
+                            </p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Предпросмотр нового файла -->
+                <div id="mediaPreview" class="media-preview"></div>
+
+                <!-- Текущий файл (если есть) -->
+                {% if entry.media_file %}
+                <div class="current-media">
+                    <div class="current-media-title">
+                        <i class="bi bi-paperclip"></i>Текущий файл:
+                    </div>
+                    {% if entry.media_file.url|slice:"-4:"|lower in ".jpg.png.gif.jpeg" %}
+                        <img src="{{ entry.media_file.url }}" alt="Медиа" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCurrentMedia()">
+                                <i class="bi bi-trash me-1"></i>Удалить текущий файл
+                            </button>
+                        </div>
+                    {% elif entry.media_file.url|slice:"-4:"|lower == ".mp4" or entry.media_file.url|slice:"-5:"|lower == ".webm" %}
+                        <video controls style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                            <source src="{{ entry.media_file.url }}" type="video/mp4">
+                        </video>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCurrentMedia()">
+                                <i class="bi bi-trash me-1"></i>Удалить текущий файл
+                            </button>
+                        </div>
+                    {% elif entry.media_file.url|slice:"-4:"|lower in ".mp3.ogg.wav" %}
+                        <audio controls style="width: 100%;">
+                            <source src="{{ entry.media_file.url }}" type="audio/mpeg">
+                        </audio>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCurrentMedia()">
+                                <i class="bi bi-trash me-1"></i>Удалить текущий файл
+                            </button>
+                        </div>
+                    {% else %}
+                        <a href="{{ entry.media_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-download me-1"></i>Скачать файл
+                        </a>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCurrentMedia()">
+                                <i class="bi bi-trash me-1"></i>Удалить текущий файл
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Кнопки действий -->
+            <button type="submit" class="btn-primary-custom">
+                <i class="bi bi-check-circle me-2"></i>Сохранить изменения
+            </button>
+
+            <a href="{% url 'diary_list' %}" class="btn-outline-custom">
+                <i class="bi bi-x-circle me-2"></i>Отмена
+            </a>
+        </form>
+    </div>
+
+    <!-- Советы по рефлексии -->
+    <div class="reflection-tips">
+        <h5 class="mb-3" style="color: #f39c12;">
+            <i class="bi bi-lightbulb me-2"></i>Советы при перечитывании записей:
+        </h5>
+
+        <div class="tip-item">
+            <i class="bi bi-emoji-smile tip-icon"></i>
+            <div class="tip-text">
+                <strong>Будьте добры к себе:</strong> Вы читаете мысли прошлой версии себя. Относитесь к ним с пониманием и состраданием.
+            </div>
+        </div>
+
+        <div class="tip-item">
+            <i class="bi bi-eye tip-icon"></i>
+            <div class="tip-text">
+                <strong>Отмечайте рост:</strong> Что изменилось с момента написания записи? Какие уроки вы извлекли?
+            </div>
+        </div>
+
+        <div class="tip-item">
+            <i class="bi bi-pencil tip-icon"></i>
+            <div class="tip-text">
+                <strong>Добавляйте заметки:</strong> Можно оставлять комментарии к старым записям, отмечая, как ваше понимание эволюционировало.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Предпросмотр файла
+function previewFile(input) {
+    const preview = document.getElementById('mediaPreview');
+    const file = input.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.innerHTML = '';
+            preview.style.display = 'block';
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Предпросмотр нового файла';
+                preview.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = e.target.result;
+                video.controls = true;
+                preview.appendChild(video);
+            } else if (file.type.startsWith('audio/')) {
+                const audio = document.createElement('audio');
+                audio.src = e.target.result;
+                audio.controls = true;
+                preview.appendChild(audio);
+            } else {
+                const div = document.createElement('div');
+                div.className = 'alert alert-info';
+                div.innerHTML = `<i class="bi bi-info-circle me-2"></i>Новый файл: ${file.name}`;
+                preview.appendChild(div);
+            }
+        };
+
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+    }
+}
+
+// Удаление текущего медиафайла
+function removeCurrentMedia() {
+    if (confirm('Вы уверены, что хотите удалить текущий файл?')) {
+        const currentMediaDiv = document.querySelector('.current-media');
+        if (currentMediaDiv) {
+            currentMediaDiv.style.transition = 'opacity 0.3s ease';
+            currentMediaDiv.style.opacity = '0';
+            setTimeout(() => {
+                currentMediaDiv.remove();
+
+                // Добавляем скрытое поле для указания удаления файла
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'remove_media';
+                hiddenInput.value = 'true';
+                document.getElementById('diaryForm').appendChild(hiddenInput);
+            }, 300);
+        }
+    }
+}
+
+// Поддержка drag and drop
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('media_file');
+    const fileLabel = document.querySelector('.file-label');
+
+    // Обработка перетаскивания
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileLabel.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // Подсветка при перетаскивании
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileLabel.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileLabel.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        fileLabel.style.background = '#e9ecef';
+        fileLabel.style.borderColor = '#3498db';
+    }
+
+    function unhighlight() {
+        fileLabel.style.background = '#f8f9fa';
+        fileLabel.style.borderColor = '#dee2e6';
+    }
+
+    // Обработка сброса файла
+    fileLabel.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+            fileInput.files = files;
+            previewFile(fileInput);
+        }
+    }
+
+    // Анимация появления формы
+    const formGroups = document.querySelectorAll('.form-group-custom');
+    formGroups.forEach((group, index) => {
+        group.style.opacity = '0';
+        group.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            group.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            group.style.opacity = '1';
+            group.style.transform = 'translateY(0)';
+        }, index * 50 + 200);
+    });
+
+    // Автофокус на текстовом поле
+    document.getElementById('text').focus();
+});
+</script>
+{% endblock %}

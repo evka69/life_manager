@@ -1,0 +1,543 @@
+{% load json_extras %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LIFE BALANCE • Менеджер жизненных сфер{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary: #4A6FA5;
+            --primary-light: #6B8CC6;
+            --secondary: #6B8E23;
+            --success: #38B2AC;
+            --info: #87CEEB;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 8px 30px rgba(74, 111, 165, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #212529;
+            background-color: var(--light-bg);
+            padding-top: 76px; /* Для фиксированной навигации */
+        }
+
+        h1, h2, h3, h4, h5, h6, .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            box-shadow: 0 4px 20px rgba(74, 111, 165, 0.15);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            margin: 0 8px;
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+
+        .user-greeting {
+            color: white;
+            font-weight: 500;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-greeting i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .main-container {
+            min-height: calc(100vh - 180px);
+            padding: 30px 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(74, 111, 165, 0.15);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 2px solid rgba(74, 111, 165, 0.1);
+            border-radius: 16px 16px 0 0 !important;
+            font-weight: 600;
+            color: var(--primary);
+            padding: 1.2rem 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(74, 111, 165, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 500;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 500;
+        }
+
+        .alert-info {
+            background-color: rgba(135, 206, 235, 0.15);
+            border: 1px solid var(--info);
+            border-radius: 12px;
+            color: #2c3e50;
+        }
+
+        .motivation-text {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 5px solid var(--success);
+            font-style: italic;
+            color: #495057;
+        }
+
+        .motivation-text i {
+            color: var(--success);
+            margin-right: 10px;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer a {
+            color: var(--info);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .balance-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 auto 15px;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .success {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Анимация появления */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        .alert {
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease;
+        margin-bottom: 1.5rem;
+        }
+        .alert-success {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid rgba(46, 204, 113, 0.3);
+        color: #27ae60;
+        }
+
+        .alert-danger {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        color: #c0392b;
+        }
+
+        .alert-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;ъ
+        }
+
+        @keyframes slideIn {
+        from {
+        opacity: 0;
+        transform: translateY(-10px);
+        }
+        to {
+        opacity: 1;
+        transform: translateY(0);
+        }
+}
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="bi bi-symmetry-vertical"></i>
+                LIFE BALANCE
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item d-flex align-items-center">
+                            <a href="{% url 'profile' %}" class="user-greeting text-decoration-none" style="color: white;">
+                                <i class="bi bi-person-circle"></i>
+                                {{ user.name }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                                <i class="bi bi-speedometer2"></i> Главная
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'sphere_list' %}active{% endif %}" href="{% url 'sphere_list' %}">
+                                <i class="bi bi-pie-chart"></i> Сферы жизни
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'goal_list' %}active{% endif %}" href="{% url 'goal_list' %}">
+                                <i class="bi bi-flag"></i> Мои цели
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'diary_list' %}active{% endif %}" href="{% url 'diary_list' %}">
+                                <i class="bi bi-journal-text"></i> Дневник
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'reminder_list' %}active{% endif %}" href="{% url 'reminder_list' %}">
+                                <i class="bi bi-bell"></i> Напоминания
+                            </a>
+                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light btn-sm ms-2" href="{% url 'logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> Выход
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
+                                <i class="bi bi-box-arrow-in-right"></i> Вход
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-light text-primary btn-sm ms-2" href="{% url 'register' %}">
+                                <i class="bi bi-person-plus"></i> Регистрация
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="main-container">
+        <div class="container fade-in">
+
+            {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {% if message.tags == 'error' or message.tags == 'danger' %}
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% else %}
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+            {% if user.is_authenticated and request.resolver_match.url_name == 'dashboard' %}
+            <div class="motivation-text">
+                <i class="bi bi-lightbulb"></i>
+                <strong>Мысль дня:</strong> Маленькие ежедневные улучшения ведут к большим изменениям. Сегодня — прекрасный день, чтобы оценить свой баланс и сделать шаг к важной цели.
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="bi bi-symmetry-vertical"></i> LIFE BALANCE</h5>
+                    <p class="mt-3">Система для осознанного управления качеством жизни через оценку сфер, целеполагание и рефлексию.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Навигация</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'dashboard' %}">Главная</a></li>
+                        <li><a href="{% url 'sphere_list' %}">Сферы жизни</a></li>
+                        <li><a href="{% url 'goal_list' %}">Мои цели</a></li>
+                        <li><a href="{% url 'diary_list' %}">Дневник</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Принципы системы</h5>
+                    <p>Баланс — это не состояние, а процесс. Регулярная оценка, маленькие шаги и осознанная рефлексия — ключ к гармоничной жизни.</p>
+                    <div class="balance-icon">
+                        <i class="bi bi-balance"></i>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4 mb-3" style="border-color: rgba(255,255,255,0.1);">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; {% now "Y" %} LIFE BALANCE • Менеджер жизненных сфер</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Разработано с <i class="bi bi-heart-fill text-danger"></i> для вашего роста</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Popup-напоминание -->
+<!-- Popup-напоминание -->
+<div id="reminder-popup" class="d-none position-fixed bottom-0 end-0 m-3" style="z-index: 1050; max-width: 350px;">
+    <div class="card border-primary shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi bi-bell-fill"></i> Напоминание</h6>
+            <button type="button" class="btn-close btn-close-white" id="reminder-close"></button>
+        </div>
+        <div class="card-body">
+            <p id="reminder-text" class="card-text"></p>
+            <div class="d-flex gap-2 mt-3">
+                <button id="reminder-action" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-arrow-right-circle"></i> Перейти
+                </button>
+                <button id="reminder-snooze" class="btn btn-warning btn-sm">
+                    <i class="bi bi-clock"></i> Отложить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+<script>
+(function() {
+    const reminders = {{ active_reminders|safe_json }};
+    let dismissedToday = {}; // ← напоминания, закрытые сегодня
+
+    function showReminder(reminder) {
+        const popup = document.getElementById('reminder-popup');
+        const textEl = document.getElementById('reminder-text');
+        const actionBtn = document.getElementById('reminder-action');
+
+        let message = '';
+        let url = '#';
+
+        if (reminder.goal) {
+            message = `<strong>Цель:</strong> ${reminder.goal.title}<br><small>Время: ${reminder.time}</small>`;
+            url = `/goals/${reminder.goal.id}/edit/`;
+        } else if (reminder.sphere) {
+            message = `<strong>Сфера:</strong> ${reminder.sphere.title}<br><small>Время: ${reminder.time}</small>`;
+            url = '/spheres/';
+        } else {
+            message = `<strong>Время для оценки баланса</strong><br><small>${reminder.time}</small>`;
+            url = '/spheres/';
+        }
+
+        textEl.innerHTML = message;
+        actionBtn.onclick = () => window.location.href = url;
+
+        // Отложить на 10 минут
+        document.getElementById('reminder-snooze').onclick = () => {
+            const now = new Date();
+            const snoozeUntil = new Date(now.getTime() + 10 * 60000);
+            localStorage.setItem(`snoozed_${reminder.id}`, snoozeUntil.getTime());
+            popup.classList.add('d-none');
+        };
+
+        // Закрыть до конца дня
+        document.getElementById('reminder-close').onclick = () => {
+            const today = new Date().toDateString();
+            localStorage.setItem(`dismissed_${reminder.id}`, today);
+            dismissedToday[reminder.id] = true;
+            popup.classList.add('d-none');
+        };
+
+        popup.classList.remove('d-none');
+    }
+
+    function checkReminders() {
+        if (reminders.length === 0) return;
+
+        const now = new Date();
+        const currentTime = now.toTimeString().slice(0, 5);
+        const today = now.toDateString();
+
+        // Восстанавливаем состояние из localStorage
+        for (const r of reminders) {
+            const snoozedUntil = localStorage.getItem(`snoozed_${r.id}`);
+            const dismissedDay = localStorage.getItem(`dismissed_${r.id}`);
+
+            if (snoozedUntil && now.getTime() < parseInt(snoozedUntil)) {
+                continue; // ещё отложено
+            }
+
+            if (dismissedDay === today) {
+                dismissedToday[r.id] = true;
+                continue; // закрыто до конца дня
+            }
+
+            if (r.time === currentTime && !dismissedToday[r.id]) {
+                showReminder(r);
+                break;
+            }
+        }
+    }
+
+    setInterval(checkReminders, 60000);
+    setTimeout(checkReminders, 1000);
+})();
+</script>
+
+    {% block extra_js %}{% endblock %}
+
+<!-- Автоматическое скрытие сообщений -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Найдём все сообщения Django
+    const messages = document.querySelectorAll('.alert');
+
+    messages.forEach(function(message) {
+        // Определим тип сообщения по классу
+        let type = 'info';
+        if (message.classList.contains('alert-success')) type = 'success';
+        if (message.classList.contains('alert-error')) type = 'error';
+        if (message.classList.contains('alert-danger')) type = 'error';
+
+        // Установим правильный цвет Bootstrap
+        message.classList.remove('alert-error'); // удалим кастомный класс
+        if (type === 'success') {
+            message.classList.add('alert-success');
+        } else if (type === 'error') {
+            message.classList.add('alert-danger');
+        }
+
+        // Скроем через 2 секунды
+        setTimeout(function() {
+            message.style.transition = 'opacity 0.5s ease';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        }, 2000); // 2 секунды
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% block title %}Оценка: {{ sphere.title }} — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assessment-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .assessment-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .assessment-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.3;
+    }
+
+    .sphere-icon-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    .previous-assessment {
+        background: rgba(255, 248, 225, 0.8);
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin: 2rem 0;
+    }
+
+    .slider-container {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        margin-top: -1rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .slider-value {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 3.5rem;
+        color: var(--primary);
+        text-align: center;
+        margin: 1rem 0;
+        transition: color 0.3s ease;
+    }
+
+    .slider-value-label {
+        text-align: center;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .custom-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 20px;
+        background: linear-gradient(90deg,
+            #e74c3c 0%,
+            #e67e22 10%,
+            #f1c40f 20%,
+            #2ecc71 40%,
+            #27ae60 60%,
+            #3498db 80%,
+            #2c3e50 100%
+        );
+        border-radius: 10px;
+        outline: none;
+        opacity: 0.9;
+        transition: opacity .2s;
+    }
+
+    .custom-slider:hover {
+        opacity: 1;
+    }
+
+    .custom-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid var(--primary);
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: transform 0.2s;
+    }
+
+    .custom-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+    }
+
+    .slider-scale {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .scale-point {
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .scale-label {
+        font-size: 0.8rem;
+        color: #95a5a6;
+        margin-top: 0.2rem;
+    }
+
+    .tips-card {
+        background: linear-gradient(135deg, rgba(56, 178, 172, 0.1) 0%, rgba(56, 178, 172, 0.05) 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid var(--success);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="assessment-container fade-in">
+    <!-- Шапка с информацией о сфере -->
+    <div class="assessment-header text-center">
+        <div class="sphere-icon-large mx-auto">
+            {% if sphere.title == "Здоровье" %}
+                <i class="bi bi-heart-pulse"></i>
+            {% elif sphere.title == "Финансы" %}
+                <i class="bi bi-cash-stack"></i>
+            {% elif sphere.title == "Карьера" %}
+                <i class="bi bi-briefcase"></i>
+            {% elif sphere.title == "Отношения" %}
+                <i class="bi bi-people"></i>
+            {% elif sphere.title == "Семья" %}
+                <i class="bi bi-house-heart"></i>
+            {% elif sphere.title == "Личностный рост" %}
+                <i class="bi bi-lightbulb"></i>
+            {% elif sphere.title == "Духовность" %}
+                <i class="bi bi-flower1"></i>
+            {% elif sphere.title == "Отдых и развлечения" %}
+                <i class="bi bi-emoji-smile"></i>
+            {% else %}
+                <i class="bi bi-circle"></i>
+            {% endif %}
+        </div>
+
+        <h1 class="display-6 fw-bold mb-3">{{ sphere.title }}</h1>
+        <p class="lead mb-0" style="opacity: 0.9;">
+            Оцените, насколько вы удовлетворены этой сферой <strong>прямо сейчас</strong>.
+        </p>
+    </div>
+
+    <!-- Основная форма -->
+    <div class="slider-container">
+        <!-- Предыдущая оценка -->
+        {% if last_assessment %}
+        <div class="previous-assessment">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="bi bi-clock-history" style="font-size: 1.5rem; color: #ffc107;"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1">Последняя оценка</h5>
+                    <p class="mb-0">
+                        <strong>{{ last_assessment.value }}/10</strong> от {{ last_assessment.date|date:"d E Y" }}
+                    </p>
+                    {% if last_assessment.value < 6 %}
+                        <p class="mb-0 mt-2 text-danger">
+                            <i class="bi bi-lightbulb me-1"></i>Возможно, сейчас хорошее время подумать, что можно улучшить.
+                        </p>
+                    {% elif last_assessment.value > 8 %}
+                        <p class="mb-0 mt-2 text-success">
+                            <i class="bi bi-stars me-1"></i>Отлично! Поддерживайте этот уровень.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <p class="text-muted mb-4" style="font-size: 1.05rem;">
+            <i class="bi bi-chat-quote me-1"></i>
+            Будьте честны с собой — это ваш инструмент для роста, а не экзамен.
+            Оцените, насколько эта сфера жизни соответствует вашим ожиданиям и потребностям.
+        </p>
+
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+
+            <!-- Слайдер оценки -->
+            <div class="mb-4">
+                <input type="range"
+                       name="value"
+                       min="1"
+                       max="10"
+                       value="{{ last_assessment.value|default:5 }}"
+                       class="custom-slider"
+                       id="assessment-slider"
+                       oninput="updateSliderValue(this.value)">
+
+                <!-- Отображение значения -->
+                <div class="slider-value" id="slider-value-display">
+                    {{ last_assessment.value|default:5 }}
+                </div>
+
+                <div class="slider-value-label">
+                    <span id="slider-description">Средняя удовлетворённость</span>
+                </div>
+
+                <!-- Шкала с пояснениями -->
+                <div class="slider-scale">
+                    {% for i in "12345678910" %}
+                    <div class="scale-point">
+                        {{ forloop.counter }}
+                        <div class="scale-label">
+                            {% if forloop.counter == 1 %}Очень плохо{% endif %}
+                            {% if forloop.counter == 5 %}Средне{% endif %}
+                            {% if forloop.counter == 10 %}Идеально{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Сообщения об ошибках -->
+            {% if error %}
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>{{ error }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Кнопки действий -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                    <i class="bi bi-check-circle me-2"></i>Сохранить оценку
+                </button>
+                <a href="{% url 'sphere_list' %}" class="btn btn-outline-secondary btn-lg px-5">
+                    <i class="bi bi-arrow-left me-2"></i>Вернуться к списку
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Карточка с советами -->
+    <div class="tips-card">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="bi bi-lightbulb-fill" style="font-size: 1.5rem; color: var(--success);"></i>
+            </div>
+            <div>
+                <h5 class="mb-2">Полезный совет</h5>
+                <p class="mb-0">
+                    Регулярная оценка помогает замечать маленькие изменения, которые в сумме дают большой результат.
+                    Даже 5 минут в день на осознанную оценку одной сферы — это инвестиция в своё благополучие.
+                    Старайтесь оценивать не то, какой "должна" быть сфера, а то, как она есть сейчас.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Функция для обновления значения слайдера
+function updateSliderValue(value) {
+    const display = document.getElementById('slider-value-display');
+    const description = document.getElementById('slider-description');
+
+    // Обновляем значение
+    display.textContent = value;
+
+    // Меняем цвет в зависимости от значения
+    if (value <= 3) {
+        display.style.color = '#e74c3c';
+        description.textContent = 'Требует срочного внимания';
+    } else if (value <= 5) {
+        display.style.color = '#f39c12';
+        description.textContent = 'Есть пространство для улучшений';
+    } else if (value <= 7) {
+        display.style.color = '#3498db';
+        description.textContent = 'Хороший уровень';
+    } else if (value <= 9) {
+        display.style.color = '#2ecc71';
+        description.textContent = 'Отличное состояние';
+    } else {
+        display.style.color = '#27ae60';
+        description.textContent = 'Идеальное состояние!';
+    }
+
+    // Анимация изменения размера
+    display.style.transform = 'scale(1.1)';
+    setTimeout(() => {
+        display.style.transform = 'scale(1)';
+    }, 150);
+}
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('assessment-slider');
+    updateSliderValue(slider.value);
+});
+</script>
+{% endblock %}

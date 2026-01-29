@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}Мои заметки — LIFE BALANCE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notes-container { max-width: 900px; margin: 0 auto; }
+    .notes-header {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(155, 89, 182, 0.05) 100%);
+        border-radius: 16px; padding: 2rem; margin-bottom: 2rem;
+        border-left: 5px solid #9b59b6;
+    }
+    .note-card {
+        background: white; border-radius: 12px; padding: 1.5rem;
+        margin-bottom: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border-left: 4px solid #9b59b6;
+    }
+    .note-title {
+        font-weight: 600; color: #2c3e50; margin-bottom: 1rem;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .note-preview-item {
+        display: flex; align-items: center; margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+    .note-preview-checkbox {
+        margin-right: 0.5rem; width: 18px; height: 18px;
+        accent-color: #9b59b6;
+    }
+    .empty-notes {
+        text-align: center; padding: 4rem 2rem;
+        background: white; border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notes-container fade-in">
+    <div class="notes-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6 fw-bold mb-2" style="color: #9b59b6;">
+                    <i class="bi bi-journal-text me-2"></i>Мои заметки
+                </h1>
+                <p class="lead mb-0 text-muted">
+                    Организуйте свои мысли и задачи с помощью чеклистов.
+                    Отмечайте выполненные пункты прямо в списке.
+                </p>
+            </div>
+            <a href="{% url 'create_note' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Новая заметка
+            </a>
+        </div>
+    </div>
+
+    {% if notes %}
+        {% for note in notes %}
+        <div class="note-card">
+            <div class="note-title">
+                <span>{{ note.title }}</span>
+                <div>
+                    <a href="{% url 'edit_note' note.id %}" class="btn btn-sm btn-outline-secondary me-2">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'delete_note' note.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Показываем только первые 2 пункта -->
+            {% for item in note.items.all|slice:":2" %}
+            <div class="note-preview-item">
+                <input type="checkbox"
+                       class="note-preview-checkbox"
+                       {% if item.is_completed %}checked{% endif %}
+                       onclick="toggleNoteItem('{{ note.id }}', '{{ item.id }}', this.checked)">
+                <span class="{% if item.is_completed %}text-decoration-line-through text-muted{% endif %}">
+                    {{ item.text }}
+                </span>
+            </div>
+            {% endfor %}
+
+            <!-- Если пунктов больше 2 -->
+            {% if note.items.count > 2 %}
+            <div class="mt-2">
+                <small class="text-muted">+{{ note.items.count|add:"-2" }} пунктов</small>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-notes">
+            <div class="mb-3">
+                <i class="bi bi-journal-x" style="font-size: 3rem; color: #bdc3c7;"></i>
+            </div>
+            <h3 class="mb-3" style="color: #9b59b6;">Нет заметок</h3>
+            <p class="text-muted mb-4">
+                Создайте первую заметку с чеклистом, чтобы начать организовывать свои задачи.
+            </p>
+            <a href="{% url 'create_note' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>Создать заметку
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Функция для переключения статуса пункта
+function toggleNoteItem(noteId, itemId, completed) {
+    fetch(`/notes/${noteId}/toggle-item/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({completed: completed})
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Возвращаем обратно, если ошибка
+            const checkbox = event.target;
+            checkbox.checked = !checkbox.checked;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const checkbox = event.target;
+        checkbox.checked = !checkbox.checked;
+    });
+}
+
+// Функция для получения CSRF токена
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
