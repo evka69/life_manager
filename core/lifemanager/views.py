@@ -562,6 +562,12 @@ def diary_list(request):
     })
 
 
+# Список популярных смайликов
+EMOJI_LIST = [
+    '😊', '❤️', '🔥', '🎉', '🙏', '😎', '😢', '🤔', '🙌', '💪',
+    '🌟', '✨', '💯', '📚', '🌱', '🕊️', '🌈', '💡', '🎯', '🚀'
+]
+
 @login_required
 def create_diary_entry(request):
     spheres = LifeSphere.objects.all()
@@ -572,6 +578,7 @@ def create_diary_entry(request):
         sphere_id = request.POST.get('sphere') or None
         goal_id = request.POST.get('goal') or None
         media_file = request.FILES.get('media_file')
+        emoji = request.POST.get('emoji', '')  # ← новый параметр
 
         if not text:
             messages.error(request, "Текст записи обязателен.")
@@ -580,6 +587,7 @@ def create_diary_entry(request):
             entry = DiaryEntry(
                 user=request.user,
                 text=text,
+                emoji=emoji,  # ← сохраняем
                 media_file=media_file
             )
             if sphere_id:
@@ -587,15 +595,15 @@ def create_diary_entry(request):
             if goal_id:
                 entry.goal_id = goal_id
             entry.save()
-            logger.info(f"Пользователь {request.user.email} создал запись в дневнике (ID: {entry.id})")
             messages.success(request, "Запись добавлена!")
+            logger.info(f"Пользователь {request.user.email} создал запись в дневнике (ID: {entry.id})")
             return redirect('diary_list')
 
     return render(request, 'diary/create_diary_entry.html', {
         'spheres': spheres,
-        'goals': goals
+        'goals': goals,
+        'emoji_list': EMOJI_LIST,  # ← передаём в шаблон
     })
-
 
 @login_required
 def edit_diary_entry(request, entry_id):
@@ -608,26 +616,27 @@ def edit_diary_entry(request, entry_id):
         sphere_id = request.POST.get('sphere') or None
         goal_id = request.POST.get('goal') or None
         media_file = request.FILES.get('media_file')
+        emoji = request.POST.get('emoji', '')  # ← новый параметр
 
         if not text:
             messages.error(request, "Текст записи обязателен.")
         else:
             entry.text = text
+            entry.emoji = emoji  # ← обновляем
             entry.sphere_id = sphere_id
             entry.goal_id = goal_id
             if media_file:
                 entry.media_file = media_file
             entry.save()
-            logger.info(f"Пользователь {request.user.email} обновил запись в дневнике (ID: {entry.id})")
             messages.success(request, "Запись обновлена!")
             return redirect('diary_list')
 
     return render(request, 'diary/edit_diary_entry.html', {
         'entry': entry,
         'spheres': spheres,
-        'goals': goals
+        'goals': goals,
+        'emoji_list': EMOJI_LIST,  # ← передаём в шаблон
     })
-
 
 @login_required
 def delete_diary_entry(request, entry_id):

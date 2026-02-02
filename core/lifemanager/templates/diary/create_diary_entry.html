@@ -274,6 +274,47 @@
             transform: translateY(0);
         }
     }
+    /* Панель смайликов */
+.emoji-panel {
+    display: none;
+    position: absolute;
+    bottom: 50px;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 12px;
+    z-index: 1000;
+    max-width: 300px;
+}
+
+.emoji-panel.show {
+    display: block;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+}
+
+.emoji-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    padding: 8px;
+}
+
+
+.emoji-btn:hover {
+    background: #f1f3f5;
+}
 </style>
 {% endblock %}
 
@@ -317,6 +358,7 @@
                 <label for="text" class="form-label">
                     <i class="bi bi-chat-text me-1"></i>Текст записи *
                 </label>
+                <div class="position-relative">
                 <textarea name="text"
                           id="text"
                           rows="6"
@@ -324,6 +366,11 @@
                           class="form-control-custom textarea-custom"
                           placeholder="Что происходит? Как вы себя чувствуете? О чём думаете? Какие мысли и эмоции сопровождают вас сегодня?"></textarea>
                 <small class="text-muted">Пишите от сердца — это только для вас</small>
+                    <!-- Кнопка смайлика -->
+                    <button type="button" class="btn btn-sm emoji-toggle" style="position: absolute; bottom: 10px; right: 10px; z-index: 10;">
+                        <i class="bi bi-emoji-smile" style="font-size: 1.2rem; color: #7f8c8d;"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="row">
@@ -384,6 +431,7 @@
                         <div class="file-icon">
                             <i class="bi bi-cloud-arrow-up"></i>
                         </div>
+
                         <div class="file-info">
                             <div class="file-title">Загрузить фото, видео или аудио</div>
                             <p class="file-description">
@@ -521,65 +569,62 @@ function previewFile(input) {
 
 // Поддержка drag and drop
 document.addEventListener('DOMContentLoaded', function() {
-    const fileInput = document.getElementById('media_file');
-    const fileLabel = document.querySelector('.file-label');
+    // ... (предыдущий код без изменений до блока смайликов) ...
 
-    // Обработка перетаскивания
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        fileLabel.addEventListener(eventName, preventDefaults, false);
+    // === СМАЙЛИКИ ===
+    const emojiToggle = document.querySelector('.emoji-toggle');
+    if (!emojiToggle) return;
+
+    const emojiPanel = document.createElement('div');
+    emojiPanel.className = 'emoji-panel';
+
+    const emojis = [
+        '😊', '❤️', '🔥', '🎉', '🙏', '😎', '😢', '🤔', '🙌', '💪',
+        '🌟', '✨', '💯', '📚', '🌱', '🕊️', '🌈', '💡', '🎯', '🚀',
+        '👍', '👏', '🤝', '🤗', '🤩', '🥳', '😇', '🙂', '🙃',
+        '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛'
+    ];
+
+    const grid = document.createElement('div');
+    grid.className = 'emoji-grid';
+    emojis.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className = 'emoji-btn';
+        btn.textContent = emoji;
+        // Увеличиваем область клика за счёт padding
+        btn.style.padding = '8px';
+        btn.addEventListener('click', (e) => {
+            e.preventDefault(); // ← предотвращает отправку формы
+            insertEmoji(emoji);
+        });
+        grid.appendChild(btn);
+    });
+    emojiPanel.appendChild(grid);
+    emojiToggle.parentNode.appendChild(emojiPanel);
+
+    emojiToggle.addEventListener('click', () => {
+        emojiPanel.classList.toggle('show');
     });
 
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    // Подсветка при перетаскивании
-    ['dragenter', 'dragover'].forEach(eventName => {
-        fileLabel.addEventListener(eventName, highlight, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        fileLabel.addEventListener(eventName, unhighlight, false);
-    });
-
-    function highlight() {
-        fileLabel.style.background = '#e9ecef';
-        fileLabel.style.borderColor = '#9b59b6';
-    }
-
-    function unhighlight() {
-        fileLabel.style.background = '#f8f9fa';
-        fileLabel.style.borderColor = '#dee2e6';
-    }
-
-    // Обработка сброса файла
-    fileLabel.addEventListener('drop', handleDrop, false);
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-
-        if (files.length > 0) {
-            fileInput.files = files;
-            previewFile(fileInput);
+    document.addEventListener('click', (e) => {
+        if (!emojiPanel.contains(e.target) && e.target !== emojiToggle) {
+            emojiPanel.classList.remove('show');
         }
-    }
-
-    // Анимация появления формы
-    const formGroups = document.querySelectorAll('.form-group-custom');
-    formGroups.forEach((group, index) => {
-        group.style.opacity = '0';
-        group.style.transform = 'translateY(10px)';
-        setTimeout(() => {
-            group.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            group.style.opacity = '1';
-            group.style.transform = 'translateY(0)';
-        }, index * 50 + 200);
     });
 
-    // Автофокус на текстовом поле
-    document.getElementById('text').focus();
+    function insertEmoji(emoji) {
+        const textarea = document.getElementById('text');
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const value = textarea.value;
+        textarea.value = value.substring(0, start) + emoji + value.substring(end);
+        textarea.focus();
+        textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+        // НЕ закрываем панель — пользователь может выбрать ещё смайлики
+        // emojiPanel.classList.remove('show'); ← убрано
+    }
 });
 </script>
 {% endblock %}

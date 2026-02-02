@@ -120,6 +120,12 @@ class DiaryEntry(models.Model):
     sphere = models.ForeignKey(LifeSphere, on_delete=models.SET_NULL, null=True, blank=True)
     goal = models.ForeignKey(Goal, on_delete=models.SET_NULL, null=True, blank=True)
     media_file = models.FileField(upload_to='diary_media/', null=True, blank=True)
+    emoji = models.CharField(
+        max_length=10,
+        blank=True,
+        default='',
+        verbose_name="Смайлик"
+    )
 
     class Meta:
         verbose_name = "Запись в дневнике"
