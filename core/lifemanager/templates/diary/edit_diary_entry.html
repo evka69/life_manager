@@ -275,7 +275,7 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         padding: 12px;
         z-index: 1000;
-        max-width: 300px;
+        max-width: 500px;
     }
     .emoji-panel.show {
         display: block;
@@ -540,7 +540,7 @@
 </div>
 
 <script>
-// Предпросмотр файла
+// === Общие функции ===
 function previewFile(input) {
     const preview = document.getElementById('mediaPreview');
     const file = input.files[0];
@@ -552,7 +552,7 @@ function previewFile(input) {
             if (file.type.startsWith('image/')) {
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.alt = 'Предпросмотр нового файла';
+                img.alt = 'Предпросмотр';
                 preview.appendChild(img);
             } else if (file.type.startsWith('video/')) {
                 const video = document.createElement('video');
@@ -567,7 +567,7 @@ function previewFile(input) {
             } else {
                 const div = document.createElement('div');
                 div.className = 'alert alert-info';
-                div.innerHTML = `<i class="bi bi-info-circle me-2"></i>Новый файл: ${file.name}`;
+                div.innerHTML = `<i class="bi bi-info-circle me-2"></i>Файл: ${file.name}`;
                 preview.appendChild(div);
             }
         };
@@ -578,7 +578,6 @@ function previewFile(input) {
     }
 }
 
-// Удаление текущего медиафайла
 function removeCurrentMedia() {
     if (confirm('Вы уверены, что хотите удалить текущий файл?')) {
         const currentMediaDiv = document.querySelector('.current-media');
@@ -597,42 +596,99 @@ function removeCurrentMedia() {
     }
 }
 
-// Поддержка drag and drop
+// === Основной инициализатор ===
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Drag & Drop ---
     const fileInput = document.getElementById('media_file');
     const fileLabel = document.querySelector('.file-label');
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        fileLabel.addEventListener(eventName, preventDefaults, false);
-    });
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
+    if (fileLabel) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, () => {
+                fileLabel.style.background = '#e9ecef';
+                fileLabel.style.borderColor = '#3498db';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, () => {
+                fileLabel.style.background = '#f8f9fa';
+                fileLabel.style.borderColor = '#dee2e6';
+            });
+        });
+
+        fileLabel.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                previewFile(fileInput);
+            }
+        });
     }
-    ['dragenter', 'dragover'].forEach(eventName => {
-        fileLabel.addEventListener(eventName, highlight, false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-        fileLabel.addEventListener(eventName, unhighlight, false);
-    });
-    function highlight() {
-        fileLabel.style.background = '#e9ecef';
-        fileLabel.style.borderColor = '#3498db';
-    }
-    function unhighlight() {
-        fileLabel.style.background = '#f8f9fa';
-        fileLabel.style.borderColor = '#dee2e6';
-    }
-    fileLabel.addEventListener('drop', handleDrop, false);
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        if (files.length > 0) {
-            fileInput.files = files;
-            previewFile(fileInput);
+
+    // --- Смайлики ---
+    const emojiToggle = document.querySelector('.emoji-toggle');
+    if (emojiToggle) {
+        const emojiPanel = document.createElement('div');
+        emojiPanel.className = 'emoji-panel';
+
+        const emojis = [
+            '😊', '❤️', '🔥', '🎉', '🙏', '😎', '😢', '🤔', '🙌', '💪',
+            '🌟', '✨', '💯', '📚', '🌱', '🕊️', '🌈', '💡', '🎯', '🚀',
+            '👍', '👏', '🤝', '🤗', '🤩', '🥳', '😇', '🙂', '🙃',
+            '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛'
+        ];
+
+        const grid = document.createElement('div');
+        grid.className = 'emoji-grid';
+        emojis.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.className = 'emoji-btn';
+            btn.textContent = emoji;
+            btn.type = 'button'; // ← КЛЮЧЕВОЕ: предотвращает отправку формы
+            btn.addEventListener('click', (e) => {
+                e.preventDefault(); // ← явно отменяем любое действие по умолчанию
+                insertEmoji(emoji);
+            });
+            grid.appendChild(btn);
+        });
+        emojiPanel.appendChild(grid);
+        emojiToggle.parentNode.appendChild(emojiPanel);
+
+        emojiToggle.addEventListener('click', () => {
+            emojiPanel.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!emojiPanel.contains(e.target) && e.target !== emojiToggle) {
+                emojiPanel.classList.remove('show');
+            }
+        });
+
+        function insertEmoji(emoji) {
+            const textarea = document.getElementById('text');
+            if (!textarea) return;
+
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const value = textarea.value;
+            textarea.value = value.substring(0, start) + emoji + value.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start + emoji.length, start + emoji.length);
         }
     }
 
-    // Анимация формы
+    // --- Фокус и анимация ---
+    const textArea = document.getElementById('text');
+    if (textArea) textArea.focus();
+
     const formGroups = document.querySelectorAll('.form-group-custom');
     formGroups.forEach((group, index) => {
         group.style.opacity = '0';
@@ -643,57 +699,6 @@ document.addEventListener('DOMContentLoaded', function() {
             group.style.transform = 'translateY(0)';
         }, index * 50 + 200);
     });
-
-    document.getElementById('text').focus();
-
-    // === СМАЙЛИКИ ===
-    const emojiToggle = document.querySelector('.emoji-toggle');
-    if (!emojiToggle) return;
-
-    const emojiPanel = document.createElement('div');
-    emojiPanel.className = 'emoji-panel';
-
-    const emojis = [
-        '😊', '❤️', '🔥', '🎉', '🙏', '😎', '😢', '🤔', '🙌', '💪',
-        '🌟', '✨', '💯', '📚', '🌱', '🕊️', '🌈', '💡', '🎯', '🚀',
-        '👍', '👏', '🤝', '🤗', '🤩', '🥳', '😇', '🙂', '🙃',
-        '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛'
-    ];
-
-    const grid = document.createElement('div');
-    grid.className = 'emoji-grid';
-    emojis.forEach(emoji => {
-        const btn = document.createElement('button');
-        btn.className = 'emoji-btn';
-        btn.textContent = emoji;
-        btn.addEventListener('click', () => insertEmoji(emoji));
-        grid.appendChild(btn);
-    });
-    emojiPanel.appendChild(grid);
-    emojiToggle.parentNode.appendChild(emojiPanel);
-
-    emojiToggle.addEventListener('click', () => {
-        emojiPanel.classList.toggle('show');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!emojiPanel.contains(e.target) && e.target !== emojiToggle) {
-            emojiPanel.classList.remove('show');
-        }
-    });
-
-    function insertEmoji(emoji) {
-        const textarea = document.getElementById('text');
-        if (!textarea) return;
-
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const value = textarea.value;
-        textarea.value = value.substring(0, start) + emoji + value.substring(end);
-        textarea.focus();
-        textarea.setSelectionRange(start + emoji.length, start + emoji.length);
-        emojiPanel.classList.remove('show');
-    }
 });
 </script>
 {% endblock %}
